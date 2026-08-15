@@ -2,26 +2,247 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; URL='https://forms.gle/Mo4RuYNUeRjMTxQp9'" />
-  <title>Redirecting...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Video Player</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-N4CN8NP0KN"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    body {
+      background-color: #0f172a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: sans-serif;
+    }
 
-  gtag('config', 'G-N4CN8NP0KN');
-</script>
+    /* Player Container */
+    .player-container {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
 
-  
-  <script>
-    // JavaScript fallback for redirect
-    window.location.href = "https://forms.gle/Mo4RuYNUeRjMTxQp9";
-  </script>
+    /* YouTube Iframe Wrap */
+    .iframe-wrapper {
+      position: absolute;
+      top: -60px; /* YouTube top title hide korar jonno subtle offset */
+      left: 0;
+      width: 100%;
+      height: calc(100% + 120px);
+      pointer-events: none; /* YouTube-e click kore redirect thamatuk */
+    }
+
+    .iframe-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Invisible Overlay to block click/redirect */
+    .click-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: calc(100% - 50px);
+      z-index: 10;
+      cursor: pointer;
+    }
+
+    /* Custom Controls Bar */
+    .controls-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 50px;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 0 15px;
+      z-index: 20;
+    }
+
+    .btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      outline: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn:hover {
+      color: #38bdf8;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      flex: 1;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 5px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #38bdf8;
+      border-radius: 5px;
+      pointer-events: none;
+    }
+
+    /* Time Display */
+    .time-display {
+      color: #fff;
+      font-size: 12px;
+      min-width: 75px;
+    }
+  </style>
 </head>
 <body>
-  <p>If you are not redirected, <a href="https://forms.gle/Mo4RuYNUeRjMTxQp9">Register Now</a>.</p>
+
+  <div class="player-container">
+    <!-- YouTube Player Target -->
+    <div class="iframe-wrapper">
+      <div id="yt-player"></div>
+    </div>
+
+    <!-- Invisible Overlay (Youtube Link Open Block Korbe) -->
+    <div class="click-overlay" id="clickOverlay"></div>
+
+    <!-- Custom Control Bar -->
+    <div class="controls-bar">
+      <button class="btn" id="playPauseBtn">▶</button>
+      
+      <div class="progress-container" id="progressContainer">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+
+      <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+      <button class="btn" id="fullscreenBtn">⛶</button>
+    </div>
+  </div>
+
+  <!-- YouTube Iframe API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    let player;
+    const videoId = 'jPxsMXBjq8I'; // Ekhane apnar YouTube Video ID bosaana (e.g. watch?v=ID)
+
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const progressBar = document.getElementById('progressBar');
+    const progressContainer = document.getElementById('progressContainer');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const clickOverlay = document.getElementById('clickOverlay');
+    const playerContainer = document.querySelector('.player-container');
+
+    // YouTube API Load Hole Automatic Call Hobe
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('yt-player', {
+        videoId: videoId,
+        playerVars: {
+          'autoplay': 0,
+          'controls': 0,          // YouTube er controls hide
+          'disablekb': 1,          // Keyboard control off
+          'modestbranding': 1,     // Minimal branding
+          'rel': 0,                // End screen e related video off
+          'showinfo': 0,
+          'iv_load_policy': 3,     // Annotations off
+          'cc_load_policy': 0,
+          'fs': 0                  // YouTube fullscreen button off
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+
+    function onPlayerReady(event) {
+      // Progress bar and time update interval
+      setInterval(updateProgress, 500);
+    }
+
+    function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.PLAYING) {
+        playPauseBtn.innerText = '❚❚';
+      } else {
+        playPauseBtn.innerText = '▶';
+      }
+    }
+
+    // Play / Pause Toggle
+    function togglePlay() {
+      if (!player) return;
+      const state = player.getPlayerState();
+      if (state === YT.PlayerState.PLAYING) {
+        player.pauseVideo();
+      } else {
+        player.playVideo();
+      }
+    }
+
+    playPauseBtn.addEventListener('click', togglePlay);
+    clickOverlay.addEventListener('click', togglePlay);
+
+    // Update Time and Progress Bar
+    function updateProgress() {
+      if (player && player.getCurrentTime) {
+        const currentTime = player.getCurrentTime();
+        const duration = player.getDuration();
+        
+        if (duration > 0) {
+          const percentage = (currentTime / duration) * 100;
+          progressBar.style.width = percentage + '%';
+          timeDisplay.innerText = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+        }
+      }
+    }
+
+    // Seek / Timeline Click Functionality
+    progressContainer.addEventListener('click', (e) => {
+      const rect = progressContainer.getBoundingClientRect();
+      const clickPosition = (e.clientX - rect.left) / rect.width;
+      const duration = player.getDuration();
+      player.seekTo(clickPosition * duration, true);
+    });
+
+    // Time Format (MM:SS)
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    // Fullscreen Toggle
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        playerContainer.requestFullscreen().catch(err => alert(err.message));
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    // Disable Right Click on Video Container
+    playerContainer.addEventListener('contextmenu', e => e.preventDefault());
+  </script>
 </body>
 </html>
