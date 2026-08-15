@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secured Custom Video Player with Speed Control & Custom Brand</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: #0f172a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Player Main Container */
+    .player-container {
+      position: relative;
+      width: 100%;
+      max-width: 850px;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+    }
+
+    /* YouTube Iframe Hide Trick */
+    .iframe-wrapper {
+      position: absolute;
+      top: -65px;
+      left: 0;
+      width: 100%;
+      height: calc(100% + 130px);
+      pointer-events: none;
+    }
+
+    .iframe-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Cover Overlay */
+    .cover-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      z-index: 15;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+    }
+
+    .cover-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* SVG Center Play Button */
+    .center-play-btn {
+      width: 70px;
+      height: 70px;
+      background: rgba(56, 189, 248, 0.9);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+      transition: transform 0.2s;
+    }
+
+    .center-play-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .center-play-btn svg {
+      width: 30px;
+      height: 30px;
+      fill: #fff;
+      margin-left: 4px;
+    }
+
+    /* Video Title Bar */
+    .video-title {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 15px 20px;
+      background: linear-gradient(rgba(0,0,0,0.8), transparent);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      z-index: 25;
+      pointer-events: none;
+    }
+
+    /* Transparent Click Blocker */
+    .click-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: calc(100% - 50px);
+      z-index: 10;
+      cursor: pointer;
+    }
+
+    /* Custom Controls Bar */
+    .controls-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 50px;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.95));
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 15px;
+      z-index: 20;
+    }
+
+    .btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      outline: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn svg {
+      width: 20px;
+      height: 20px;
+      fill: #fff;
+    }
+
+    .btn:hover svg {
+      fill: #38bdf8;
+    }
+
+    /* Persistent Brand Logo */
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #38bdf8;
+      font-weight: 700;
+      font-size: 14px;
+      margin-right: 5px;
+    }
+
+    .brand-logo svg {
+      width: 22px;
+      height: 22px;
+      fill: #38bdf8;
+    }
+
+    /* Volume Controls */
+    .volume-container {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .volume-slider {
+      width: 50px;
+      height: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #38bdf8;
+      cursor: pointer;
+    }
+
+    /* Speed Dropdown Menu */
+    .speed-select {
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      padding: 2px 4px;
+      font-size: 12px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .speed-select option {
+      background: #0f172a;
+      color: #fff;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      flex: 1;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 5px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #38bdf8;
+      border-radius: 5px;
+      pointer-events: none;
+    }
+
+    .time-display {
+      color: #fff;
+      font-size: 11px;
+      min-width: 65px;
+    }
+  </style>
+</head>
+<body oncontextmenu="return false;">
+
+  <div class="player-container" id="playerContainer">
+    
+    <!-- Video Title -->
+    <div class="video-title" id="videoTitleText">Lecture 01: Course Overview</div>
+
+    <!-- YouTube Frame -->
+    <div class="iframe-wrapper">
+      <div id="yt-player"></div>
+    </div>
+
+    <!-- Cover Image Overlay -->
+    <div class="cover-overlay" id="coverOverlay">
+      <div class="center-play-btn">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+    </div>
+
+    <!-- Transparent Click Overlay -->
+    <div class="click-overlay" id="clickOverlay"></div>
+
+    <!-- Custom Controls Bar -->
+    <div class="controls-bar">
+      
+      <!-- Persistent Brand Logo (Always Visible) -->
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span>ACADEMY</span>
+      </div>
+
+      <!-- Play/Pause Button -->
+      <button class="btn" id="playPauseBtn">
+        <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+      
+      <!-- Volume Controls -->
+      <div class="volume-container">
+        <button class="btn" id="muteBtn">
+          <svg id="volumeIcon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+          <svg id="muteIcon" viewBox="0 0 24 24" style="display:none;"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+        </button>
+        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="100">
+      </div>
+
+      <!-- Video Progress Bar -->
+      <div class="progress-container" id="progressContainer">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+
+      <!-- Time Display -->
+      <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+      
+      <!-- Speed Controller Dropdown -->
+      <select class="speed-select" id="speedSelect">
+        <option value="0.5">0.5x</option>
+        <option value="1" selected>1x</option>
+        <option value="1.25">1.25x</option>
+        <option value="1.5">1.5x</option>
+        <option value="2">2x</option>
+      </select>
+
+      <!-- Fullscreen Button -->
+      <button class="btn" id="fullscreenBtn">
+        <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    const currentVideoConfig = {
+      title: "Class 01: Introduction to Web Development",
+      youtubeId: "jPxsMXBjq8I",
+      coverImage: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800"
+    };
+
+    const videoTitleText = document.getElementById('videoTitleText');
+    const coverOverlay = document.getElementById('coverOverlay');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const playIcon = document.getElementById('playIcon');
+    const pauseIcon = document.getElementById('pauseIcon');
+    const muteBtn = document.getElementById('muteBtn');
+    const volumeIcon = document.getElementById('volumeIcon');
+    const muteIcon = document.getElementById('muteIcon');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const progressBar = document.getElementById('progressBar');
+    const progressContainer = document.getElementById('progressContainer');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const speedSelect = document.getElementById('speedSelect');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const clickOverlay = document.getElementById('clickOverlay');
+    const playerContainer = document.getElementById('playerContainer');
+
+    videoTitleText.innerText = currentVideoConfig.title;
+    coverOverlay.style.backgroundImage = `url('${currentVideoConfig.coverImage}')`;
+
+    let player;
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('yt-player', {
+        videoId: currentVideoConfig.youtubeId,
+        playerVars: {
+          'autoplay': 0,
+          'controls': 0,
+          'disablekb': 1,
+          'modestbranding': 1,
+          'rel': 0,
+          'showinfo': 0,
+          'iv_load_policy': 3,
+          'fs': 0
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+
+    function onPlayerReady() {
+      if (player.setPlaybackQualityRange) {
+        player.setPlaybackQualityRange('large', 'large');
+      }
+      setInterval(updateProgress, 300);
+    }
+
+    function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.PLAYING) {
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'block';
+        coverOverlay.classList.add('hidden');
+      } else {
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+      }
+    }
+
+    function togglePlay() {
+      if (!player) return;
+      const state = player.getPlayerState();
+      if (state === YT.PlayerState.PLAYING) {
+        player.pauseVideo();
+      } else {
+        player.playVideo();
+      }
+    }
+
+    coverOverlay.addEventListener('click', togglePlay);
+    playPauseBtn.addEventListener('click', togglePlay);
+    clickOverlay.addEventListener('click', togglePlay);
+
+    // Speed Control Logic
+    speedSelect.addEventListener('change', (e) => {
+      const speed = parseFloat(e.target.value);
+      if (player && player.setPlaybackRate) {
+        player.setPlaybackRate(speed);
+      }
+    });
+
+    // Volume Controls
+    volumeSlider.addEventListener('input', (e) => {
+      const vol = e.target.value;
+      player.setVolume(vol);
+      updateVolumeIcons(vol);
+    });
+
+    muteBtn.addEventListener('click', () => {
+      if (player.isMuted()) {
+        player.unMute();
+        const currentVol = player.getVolume() || 100;
+        volumeSlider.value = currentVol;
+        updateVolumeIcons(currentVol);
+      } else {
+        player.mute();
+        volumeSlider.value = 0;
+        updateVolumeIcons(0);
+      }
+    });
+
+    function updateVolumeIcons(vol) {
+      if (vol == 0) {
+        volumeIcon.style.display = 'none';
+        muteIcon.style.display = 'block';
+      } else {
+        volumeIcon.style.display = 'block';
+        muteIcon.style.display = 'none';
+      }
+    }
+
+    // Time & Progress Loophole Logic (Hides YouTube End Screen Grid)
+    function updateProgress() {
+      if (player && player.getCurrentTime) {
+        const currentTime = player.getCurrentTime();
+        const duration = player.getDuration();
+        
+        if (duration > 0) {
+          // Loophole: Stop video 0.5 sec before ending to block YouTube Related Grid
+          if (duration - currentTime <= 0.5 && player.getPlayerState() === YT.PlayerState.PLAYING) {
+            player.pauseVideo();
+            player.seekTo(0, false); // Reset video back to start
+            coverOverlay.classList.remove('hidden'); // Show thumbnail overlay back
+            return;
+          }
+
+          progressBar.style.width = (currentTime / duration) * 100 + '%';
+          timeDisplay.innerText = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+        }
+      }
+    }
+
+    progressContainer.addEventListener('click', (e) => {
+      const rect = progressContainer.getBoundingClientRect();
+      const clickPos = (e.clientX - rect.left) / rect.width;
+      player.seekTo(clickPos * player.getDuration(), true);
+    });
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    // Fullscreen
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        playerContainer.requestFullscreen().catch(err => alert(err.message));
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    // Disable Right Click & Inspect Shortcuts
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', (e) => {
+      if (
+        e.keyCode === 123 ||
+        (e.ctrlKey && e.shiftKey && e.keyCode === 73) ||
+        (e.ctrlKey && e.keyCode === 85)
+      ) {
+        e.preventDefault();
+        return false;
+      }
+    });
+  </script>
+</body>
+</html>
