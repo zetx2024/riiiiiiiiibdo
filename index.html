@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Custom Video Player</title>
+  <title>Custom Video Player with Volume & Quality Settings</title>
   <style>
     * {
       box-sizing: border-box;
@@ -35,11 +35,11 @@
     /* YouTube Iframe Wrap */
     .iframe-wrapper {
       position: absolute;
-      top: -60px; /* YouTube top title hide korar jonno subtle offset */
+      top: -60px;
       left: 0;
       width: 100%;
       height: calc(100% + 120px);
-      pointer-events: none; /* YouTube-e click kore redirect thamatuk */
+      pointer-events: none;
     }
 
     .iframe-wrapper iframe {
@@ -69,7 +69,7 @@
       background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 12px;
       padding: 0 15px;
       z-index: 20;
     }
@@ -88,6 +88,34 @@
 
     .btn:hover {
       color: #38bdf8;
+    }
+
+    /* Volume Control Section */
+    .volume-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .volume-slider {
+      width: 60px;
+      height: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #38bdf8;
+      cursor: pointer;
     }
 
     /* Progress Bar */
@@ -119,34 +147,43 @@
 <body>
 
   <div class="player-container">
-    <!-- YouTube Player Target -->
     <div class="iframe-wrapper">
       <div id="yt-player"></div>
     </div>
 
-    <!-- Invisible Overlay (Youtube Link Open Block Korbe) -->
     <div class="click-overlay" id="clickOverlay"></div>
 
-    <!-- Custom Control Bar -->
     <div class="controls-bar">
+      <!-- Play / Pause Button -->
       <button class="btn" id="playPauseBtn">▶</button>
       
+      <!-- Volume Controls -->
+      <div class="volume-container">
+        <button class="btn" id="muteBtn">🔊</button>
+        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="100">
+      </div>
+
+      <!-- Video Progress Bar -->
       <div class="progress-container" id="progressContainer">
         <div class="progress-bar" id="progressBar"></div>
       </div>
 
+      <!-- Time Display -->
       <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+      
+      <!-- Fullscreen Button -->
       <button class="btn" id="fullscreenBtn">⛶</button>
     </div>
   </div>
 
-  <!-- YouTube Iframe API -->
   <script src="https://www.youtube.com/iframe_api"></script>
   <script>
     let player;
-    const videoId = 'jPxsMXBjq8I'; // Ekhane apnar YouTube Video ID bosaana (e.g. watch?v=ID)
+    const videoId = 'jPxsMXBjq8I'; // আপনার ভিডিওর ID এখানে দিন
 
     const playPauseBtn = document.getElementById('playPauseBtn');
+    const muteBtn = document.getElementById('muteBtn');
+    const volumeSlider = document.getElementById('volumeSlider');
     const progressBar = document.getElementById('progressBar');
     const progressContainer = document.getElementById('progressContainer');
     const timeDisplay = document.getElementById('timeDisplay');
@@ -154,20 +191,19 @@
     const clickOverlay = document.getElementById('clickOverlay');
     const playerContainer = document.querySelector('.player-container');
 
-    // YouTube API Load Hole Automatic Call Hobe
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('yt-player', {
         videoId: videoId,
         playerVars: {
           'autoplay': 0,
-          'controls': 0,          // YouTube er controls hide
-          'disablekb': 1,          // Keyboard control off
-          'modestbranding': 1,     // Minimal branding
-          'rel': 0,                // End screen e related video off
+          'controls': 0,
+          'disablekb': 1,
+          'modestbranding': 1,
+          'rel': 0,
           'showinfo': 0,
-          'iv_load_policy': 3,     // Annotations off
+          'iv_load_policy': 3,
           'cc_load_policy': 0,
-          'fs': 0                  // YouTube fullscreen button off
+          'fs': 0
         },
         events: {
           'onReady': onPlayerReady,
@@ -177,13 +213,21 @@
     }
 
     function onPlayerReady(event) {
-      // Progress bar and time update interval
+      // 480p (Large) Quality Request (ইউটিউব সাপোর্ট করলে অটোমেটিক ৪৮০p তে প্লে হবে)
+      if (player.setPlaybackQualityRange) {
+        player.setPlaybackQualityRange('large', 'large');
+      }
+      
       setInterval(updateProgress, 500);
     }
 
     function onPlayerStateChange(event) {
       if (event.data === YT.PlayerState.PLAYING) {
         playPauseBtn.innerText = '❚❚';
+        // ভিডিও প্লে শুরু হলে আবার 480p কোয়ালিটি রি-এপ্লাই করার চেষ্টা করবে
+        if (player.setPlaybackQuality) {
+          player.setPlaybackQuality('large');
+        }
       } else {
         playPauseBtn.innerText = '▶';
       }
@@ -203,6 +247,29 @@
     playPauseBtn.addEventListener('click', togglePlay);
     clickOverlay.addEventListener('click', togglePlay);
 
+    // Volume Slider & Mute Functionality
+    volumeSlider.addEventListener('input', (e) => {
+      const volume = e.target.value;
+      player.setVolume(volume);
+      if (volume == 0) {
+        muteBtn.innerText = '🔇';
+      } else {
+        muteBtn.innerText = '🔊';
+      }
+    });
+
+    muteBtn.addEventListener('click', () => {
+      if (player.isMuted()) {
+        player.unMute();
+        muteBtn.innerText = '🔊';
+        volumeSlider.value = player.getVolume() || 100;
+      } else {
+        player.mute();
+        muteBtn.innerText = '🔇';
+        volumeSlider.value = 0;
+      }
+    });
+
     // Update Time and Progress Bar
     function updateProgress() {
       if (player && player.getCurrentTime) {
@@ -217,7 +284,7 @@
       }
     }
 
-    // Seek / Timeline Click Functionality
+    // Seek / Timeline Click
     progressContainer.addEventListener('click', (e) => {
       const rect = progressContainer.getBoundingClientRect();
       const clickPosition = (e.clientX - rect.left) / rect.width;
@@ -225,7 +292,6 @@
       player.seekTo(clickPosition * duration, true);
     });
 
-    // Time Format (MM:SS)
     function formatTime(seconds) {
       const mins = Math.floor(seconds / 60);
       const secs = Math.floor(seconds % 60);
@@ -241,7 +307,7 @@
       }
     });
 
-    // Disable Right Click on Video Container
+    // Disable Right Click
     playerContainer.addEventListener('contextmenu', e => e.preventDefault());
   </script>
 </body>
