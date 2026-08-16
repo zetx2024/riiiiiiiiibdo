@@ -28,3 +28,10 @@ input[type=email],input[type=password],input[type=text]{width:100%;padding:13px;
 .modal{background:white;border-radius:18px;width:min(100%,680px);padding:24px;max-height:90vh;overflow:auto}
 .rules li{margin:8px 0}
 @media(max-width:600px){.card{padding:20px}.actions .btn{width:100%}.topbar{font-size:14px}}
+/* v3 modal and dashboard-style student UI */
+.overlay,.modal-backdrop{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;background:rgba(2,6,23,.78)!important;z-index:99999!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:16px!important;overflow:auto!important}
+.overlay .modal,.modal-backdrop .modal{position:relative!important;margin:auto!important;display:block!important;width:min(100%,720px)!important;max-height:calc(100vh - 32px)!important;overflow:auto!important;background:#fff!important;border-radius:22px!important;padding:26px!important;box-shadow:0 30px 100px rgba(0,0,0,.4)!important;animation:modalIn .18s ease-out}
+@keyframes modalIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+#qrcode{position:absolute;left:-99999px;top:-99999px;width:100px;height:100px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}.stat{padding:14px;border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc}.stat b{display:block;font-size:1.2rem;color:var(--blue)}
+@media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.overlay,.modal-backdrop{padding:10px}.overlay .modal,.modal-backdrop .modal{padding:18px;max-height:calc(100vh - 20px)}}
