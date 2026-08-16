@@ -1,4 +1,4 @@
-const API_URL="https://i.eptonline.org/quiz.php";
+const API_URL="https://i.eptonline.org/quij/quiz.php";
 
 let quiz=null,user=null,answers={},startedAt=0,timerId=null,strikes=0,submitted=false,guardInstalled=false;
 const app=document.getElementById("app");
