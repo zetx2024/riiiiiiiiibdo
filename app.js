@@ -1,26 +1,209 @@
 const API="https://i.eptonline.org/quij/quiz.php";
 const CERT_API=API;
-let user=null,quiz=null,attemptId=null,timer=null,startedAt=0,violations=0,submitting=false;
+let user=null, quiz=null, attemptId=null, timer=null, startedAt=0, violations=0, submitting=false;
+
 const esc=x=>String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-const key=()=>"iarco_quiz_state_"+String(user.email).toLowerCase();
+const safeEmail=()=>String(user?.email??"").trim().toLowerCase();
+const key=()=>`iarco_quiz_state_${safeEmail()}`;
 const read=()=>{try{return JSON.parse(localStorage.getItem(key())||"null")}catch{return null}};
 const save=x=>localStorage.setItem(key(),JSON.stringify(x));
-async function api(action,p={}){const r=await fetch(API+"?action="+encodeURIComponent(action),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});const j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw Error(j.message||"Server error");return j}
-function protect(){const b=e=>e.preventDefault();for(const n of ["contextmenu","copy","cut","dragstart","selectstart"])document.addEventListener(n,b);document.addEventListener("keydown",e=>{const k=String(e.key ?? "").toLowerCase();if(e.key==="F12"||((e.ctrlKey||e.metaKey)&&["a","c","u","s","p"].includes(k))||(e.ctrlKey&&e.shiftKey&&["i","j","c"].includes(k)))e.preventDefault()})}
-function login(){document.body.innerHTML=`<main class="shell"><div class="card"><h1 class="brand">IARCO Secure Quiz</h1><p class="small">Authorized participants only.</p><label class="field">Email</label><input id=email class=field type=email autocomplete=username placeholder=Email><label class="field">Password</label><input id=password class=field type=password autocomplete=current-password placeholder=Password><button id=login class="btn gold">Login</button><div id=msg></div></div></main>`;protect();const go=async()=>{try{const list=await fetch("users.json",{cache:"no-store"}).then(r=>r.json()),email=document.querySelector("#email").value.trim().toLowerCase(),password=document.querySelector("#password").value,x=list.find(v=>String(v.email).toLowerCase()===email&&v.password===password);if(!x)throw Error("Invalid email or password");user={...x,email};localStorage.setItem("iarco_quiz_user",JSON.stringify(user));user.session_id=crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random();localStorage.setItem("iarco_quiz_user",JSON.stringify(user));await api("login",user);await home()}catch(e){const m=document.querySelector("#msg");m.className="msg error";m.textContent=e.message}};document.querySelector("#login").onclick=go;document.querySelectorAll("input").forEach(i=>i.addEventListener("keydown",e=>{if(e.key==="Enter")go()}))}
-async function home(){let s=read();try{const r=await api("status",{email:user.email});if(r.exists){s={status:r.status,score:r.score,total_questions:r.total_questions,percentile:r.percentile,submitted_at:r.submitted_at,time_taken:r.time_taken,duration_minutes:r.duration_minutes,certificate_file:r.certificate_file};save(s)}else{s=null;localStorage.removeItem(key())}}catch{}document.body.className="";document.body.innerHTML=`<main class=shell><div class=card><h1 class=brand>Welcome, ${esc(user.name||user.email)}</h1><p>${esc(user.institution||user.school||"")}</p><div id=content></div></div></main>`;const c=document.querySelector("#content");if(s?.status==="COMPLETED")c.innerHTML=`<div class="msg success"><div class=score>${esc(s.score)}/${esc(s.total_questions)}</div><b>Assessment completed.</b><br>Percentile: <b>${Number(s.percentile).toFixed(2)}%</b><br>Time taken: <b>${formatSeconds(s.time_taken)}</b><br>Total duration: <b>${esc(s.duration_minutes)} minutes</b><br>Submitted: ${esc(s.submitted_at||"")}<br><span class="small">Certificate: ${esc(s.certificate_file||"generated and emailed")}</span></div><p class=small>Admin deletion is required for another attempt.</p>`;else if(s?.status==="CHEATED")c.innerHTML=`<div class="msg error"><b>Attempt closed.</b><br>${esc(user.name||user.email)}, a violation was recorded.</div>`;else if(s?.status==="STARTED")c.innerHTML=`<div class=msg>An attempt is already registered.</div>`;else{c.innerHTML=`<button id=start class="btn gold">Start Quiz</button>`;document.querySelector("#start").onclick=async()=>{try{await loadQuiz();instructions()}catch(e){alert(e.message)}}}}
-async function loadQuiz(){const q=await fetch("quiz.json",{cache:"no-store"}).then(r=>r.json());if(!q.variants?.length)throw Error("No quiz variants found");quiz={source:q,time_limit_minutes:q.time_limit_minutes||15}}
-function instructions(){const total=quiz.source.variants.reduce((n,v)=>n+v.questions.length,0);const el=document.createElement("div");el.id="modal";el.className="modal-backdrop";el.innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="quizInstructions"><h2 id=quizInstructions>Assessment Instructions</h2><div class=notice><b>Quiz:</b> ${esc(quiz.source.title||"IARCO Assessment")}<br><b>Question pool:</b> ${total}<br><b>Duration:</b> ${esc(quiz.time_limit_minutes)} minutes</div><div class=rules><ul><li>One attempt is allowed unless an administrator deletes the record.</li><li>Do not switch tabs/windows or leave the assessment.</li><li>Copy, right-click and common developer shortcuts are blocked.</li><li>Focus/visibility violations are recorded in MySQL.</li><li>The assessment automatically submits when the countdown reaches zero.</li></ul></div><div class=actions><button id=attempt class="btn gold">Attempt Quiz</button><button id=cancel class=btn>Cancel</button></div></div>`;document.body.appendChild(el);el.querySelector("#cancel").onclick=()=>el.remove();el.querySelector("#attempt").onclick=start;el.addEventListener("click",e=>{if(e.target===el)e.stopPropagation()});setTimeout(()=>el.querySelector("#attempt")?.focus(),50)}
-async function start(){try{const variants=quiz.source.variants,v=variants[Math.floor(Math.random()*variants.length)];quiz={time_limit_minutes:quiz.source.time_limit_minutes||15,variant_id:v.id,questions:[...v.questions].sort(()=>Math.random()-.5).map(x=>({...x,options:x.options?[...x.options].sort(()=>Math.random()-.5):x.options}))};const r=await api("start",{email:user.email,name:user.name||"",institution:user.institution||user.school||"",country:user.country||"",category:user.category||user.role||"",variant_id:quiz.variant_id,participant_id:user.participant_id||user.id||"",program:user.program||"",batch:user.batch||"",image:user.image||"",role:user.role||"",participation_date:user.date||"",years:user.years||"",session_id:user.session_id||""});attemptId=r.attempt_id;startedAt=Date.now();save({status:"STARTED",attempt_id:attemptId,variant_id:quiz.variant_id,duration_minutes:quiz.time_limit_minutes});document.querySelector("#modal")?.remove();render();guards();startTimer()}catch(e){alert(e.message)}}
-function render(){document.body.className="quiz-active";document.body.innerHTML=`<div class="quiz-top"><div class="timer-wrap"><div class="timer" id=timerBox>⏱ <span>Time Remaining</span><strong id=time>--:--</strong></div></div></div><main class=shell><div class=quiz-header><h1>IARCO Assessment</h1><div>Answer each question carefully.</div><div class=quiz-meta><span class=badge>${quiz.questions.length} Questions</span><span class=badge>${quiz.time_limit_minutes} Minutes</span><span class=badge>Variant ${esc(quiz.variant_id)}</span></div></div><form id=form>${quiz.questions.map((q,i)=>`<section class=question><h3><span class=question-number>${i+1}</span>${esc(q.question)}</h3>${q.type==="single"?q.options.map(o=>`<label class=option><input type=radio name=q_${esc(q.id)} value="${esc(o)}"> ${esc(o)}</label>`).join(""):""}${q.type==="multi"?q.options.map(o=>`<label class=option><input type=checkbox name=q_${esc(q.id)} value="${esc(o)}"> ${esc(o)}</label>`).join(""):""}${q.type==="text"?`<input class=field name=q_${esc(q.id)} maxlength=500 placeholder="Type your short answer">`:""}</section>`).join("")}<div class=submit-bar><button class="btn gold">Submit Assessment</button></div></form></main>`;document.querySelector("#form").onsubmit=e=>{e.preventDefault();if(confirm("Submit your assessment now?"))submit("MANUAL")}}
-function answers(){const o={};for(const q of quiz.questions){const a=[...document.querySelectorAll(`[name="q_${CSS.escape(q.id)}"]`)];o[q.id]=q.type==="multi"?a.filter(x=>x.checked).map(x=>x.value):(a.find(x=>x.checked)?.value??a[0]?.value??"")}return o}
+
+async function api(action,p={}){
+  const r=await fetch(`${API}?action=${encodeURIComponent(action)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
+  const j=await r.json().catch(()=>({ok:false,message:`Server returned ${r.status}`}));
+  if(!r.ok||!j.ok) throw Error(j.message||`Server error (${r.status})`);
+  return j;
+}
+
+function protect(){
+  const b=e=>e.preventDefault();
+  for(const n of ["contextmenu","copy","cut","dragstart","selectstart"]) document.addEventListener(n,b);
+  document.addEventListener("keydown",e=>{
+    const k=String(e.key??"").toLowerCase();
+    if(e.key==="F12"||((e.ctrlKey||e.metaKey)&&["a","c","u","s","p"].includes(k))||(e.ctrlKey&&e.shiftKey&&["i","j","c"].includes(k))) e.preventDefault();
+  });
+}
+
+function setPage(html,cls=""){
+  document.body.className=cls;
+  document.body.innerHTML=html;
+}
+
+function login(){
+  setPage(`<main class="auth-shell"><section class="auth-card">
+    <div class="brand-mark">I</div><div class="eyebrow">SECURE ASSESSMENT PORTAL</div>
+    <h1>IARCO Assessment</h1><p class="muted">Authorized participants only. Sign in to continue.</p>
+    <div class="form-group"><label for="email">Email address</label><input id="email" class="field" type="email" autocomplete="username" placeholder="you@example.com"></div>
+    <div class="form-group"><label for="password">Password</label><input id="password" class="field" type="password" autocomplete="current-password" placeholder="Enter your password"></div>
+    <button id="login" class="btn gold full">Sign in securely</button><div id="msg" class="form-message"></div>
+  </section></main>`);
+  protect();
+  const go=async()=>{
+    const msg=document.querySelector("#msg");
+    try{
+      msg.textContent="Checking authorization…";msg.className="form-message loading";
+      const list=await fetch("users.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("Could not load participant data");return r.json()});
+      const email=String(document.querySelector("#email")?.value??"").trim().toLowerCase();
+      const password=String(document.querySelector("#password")?.value??"");
+      const x=Array.isArray(list)?list.find(v=>String(v?.email??"").trim().toLowerCase()===email&&String(v?.password??"")===password):null;
+      if(!x) throw Error("Invalid email or password");
+      user={...x,email};
+      user.session_id=crypto.randomUUID?crypto.randomUUID():`${Date.now()}_${Math.random().toString(36).slice(2)}`;
+      localStorage.setItem("iarco_quiz_user",JSON.stringify(user));
+      await api("login",user);
+      await home();
+    }catch(e){msg.className="form-message error";msg.textContent=e.message||"Login failed";}
+  };
+  document.querySelector("#login").onclick=go;
+  document.querySelectorAll("#email,#password").forEach(i=>i.addEventListener("keydown",e=>{if(e.key==="Enter")go()}));
+}
+
+async function home(){
+  let s=read();
+  try{
+    const r=await api("status",{email:safeEmail()});
+    if(r.exists){s={status:r.status,score:r.score,total_questions:r.total_questions,percentile:r.percentile,submitted_at:r.submitted_at,time_taken:r.time_taken,duration_minutes:r.duration_minutes,certificate_file:r.certificate_file,email_status:r.email_status};save(s)}
+    else{s=null;localStorage.removeItem(key())}
+  }catch(e){/* keep cached state if API temporarily unavailable */}
+
+  const name=String(user?.name||safeEmail());
+  const institution=String(user?.institution||user?.school||"");
+  const program=String(user?.program||"IARCO Assessment");
+  setPage(`<main class="portal-shell"><section class="student-card">
+    <div class="student-head"><div><div class="eyebrow">IARCO SECURE ASSESSMENT</div><h1>Welcome, ${esc(name)}</h1><p class="muted">${esc(institution)}</p></div><div class="participant-chip">${esc(String(user?.participant_id||user?.id||"Participant"))}</div></div>
+    <div id="content"></div>
+  </section></main>`);
+  const c=document.querySelector("#content");
+  if(!c)return;
+  if(s?.status==="COMPLETED"){
+    c.innerHTML=`<div class="result-hero"><div class="result-icon">✓</div><div><div class="eyebrow">ASSESSMENT COMPLETED</div><h2>Thank you for participating</h2><p>Your result has been securely recorded.</p></div></div>
+      <div class="stats-grid"><div class="stat"><span>Score</span><b>${esc(s.score)}/${esc(s.total_questions)}</b></div><div class="stat"><span>Percentile</span><b>${Number(s.percentile).toFixed(2)}%</b></div><div class="stat"><span>Time taken</span><b>${formatSeconds(s.time_taken)}</b></div><div class="stat"><span>Total duration</span><b>${esc(s.duration_minutes)} min</b></div></div>
+      <div class="certificate-status ${s.email_status==='SENT'?'good':'warn'}"><strong>Certificate delivery:</strong> ${esc(s.email_status||"PENDING")}<br><span>${esc(s.certificate_file||"Certificate processing is in progress.")}</span></div>
+      <p class="muted center-note">Another attempt is available only after an administrator deletes this submission.</p>`;
+  }else if(s?.status==="CHEATED"){
+    c.innerHTML=`<div class="status-panel danger-panel"><strong>Attempt closed</strong><p>${esc(name)}, a quiz security violation was recorded. Please contact the administrator.</p></div>`;
+  }else if(s?.status==="STARTED"){
+    c.innerHTML=`<div class="status-panel warning-panel"><strong>Attempt already registered</strong><p>An assessment attempt is already active or was not completed. Contact the administrator if you need assistance.</p></div>`;
+  }else{
+    c.innerHTML=`<div class="assessment-intro"><div class="intro-icon">Q</div><div><h2>Ready for your assessment?</h2><p>Questions and answer options are randomized for each attempt.</p></div></div>
+      <div class="info-grid"><div><span>Participant</span><b>${esc(name)}</b></div><div><span>Program</span><b>${esc(program)}</b></div><div><span>Category</span><b>${esc(user?.category||user?.role||"Participant")}</b></div><div><span>Year</span><b>${esc(user?.years||new Date().getFullYear())}</b></div></div>
+      <button id="start" class="btn gold full start-btn">Start Assessment <span>→</span></button>`;
+    document.querySelector("#start").onclick=async()=>{try{await loadQuiz();instructions()}catch(e){alert(e.message)}};
+  }
+}
+
+async function loadQuiz(){
+  const q=await fetch("quiz.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("Unable to load quiz configuration");return r.json()});
+  if(!Array.isArray(q?.variants)||!q.variants.length)throw Error("No quiz variants found in quiz.json");
+  const valid=q.variants.filter(v=>v&&v.id&&Array.isArray(v.questions)&&v.questions.length);
+  if(!valid.length)throw Error("Quiz variants are configured incorrectly.");
+  quiz={source:{...q,variants:valid},time_limit_minutes:Number(q.time_limit_minutes)||15};
+}
+
+function instructions(){
+  const variants=quiz.source.variants;
+  const total=variants.reduce((n,v)=>n+v.questions.length,0);
+  const el=document.createElement("div");el.id="modal";el.className="modal-backdrop";
+  el.innerHTML=`<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="quizInstructions">
+    <div class="modal-top"><div class="modal-icon">✓</div><div><div class="eyebrow">BEFORE YOU BEGIN</div><h2 id="quizInstructions">Assessment instructions</h2></div></div>
+    <div class="modal-summary"><div><span>Question pool</span><strong>${total}</strong></div><div><span>Questions per variant</span><strong>${variants[0].questions.length}</strong></div><div><span>Time limit</span><strong>${esc(quiz.time_limit_minutes)} min</strong></div></div>
+    <div class="rules"><h3>Important rules</h3><ul><li>Only one attempt is permitted unless an administrator deletes the existing attempt.</li><li>Do not switch tabs, windows, or leave the assessment page.</li><li>Copying, right-clicking and common developer shortcuts are blocked.</li><li>Security/focus violations are recorded in the assessment database.</li><li>The assessment submits automatically when the countdown reaches zero.</li></ul></div>
+    <div class="modal-actions"><button id="cancel" class="btn secondary">Cancel</button><button id="attempt" class="btn gold">Attempt Quiz <span>→</span></button></div>
+  </div>`;
+  document.body.appendChild(el);
+  el.querySelector("#cancel").onclick=()=>el.remove();
+  el.querySelector("#attempt").onclick=start;
+  requestAnimationFrame(()=>el.querySelector("#attempt")?.focus());
+}
+
+async function start(){
+  try{
+    const variants=quiz.source.variants;
+    const v=variants[Math.floor(Math.random()*variants.length)];
+    if(!v?.id||!Array.isArray(v.questions))throw Error("Selected quiz variant is invalid.");
+    quiz={time_limit_minutes:Number(v.time_limit_minutes||quiz.source.time_limit_minutes||15),variant_id:String(v.id).toUpperCase(),questions:[...v.questions].sort(()=>Math.random()-.5).map(x=>({...x,options:Array.isArray(x.options)?[...x.options].sort(()=>Math.random()-.5):x.options}))};
+    const r=await api("start",{email:safeEmail(),name:user.name||"",institution:user.institution||user.school||"",country:user.country||"",category:user.category||user.role||"",variant_id:quiz.variant_id,participant_id:user.participant_id||user.id||"",program:user.program||"",batch:user.batch||"",image:user.image||"",role:user.role||"",participation_date:user.date||"",years:user.years||"",session_id:user.session_id||""});
+    attemptId=r.attempt_id;startedAt=Date.now();save({status:"STARTED",attempt_id:attemptId,variant_id:quiz.variant_id,duration_minutes:quiz.time_limit_minutes});
+    document.querySelector("#modal")?.remove();render();guards();startTimer();
+  }catch(e){alert(e.message||"Could not start the assessment.")}
+}
+
+function render(){
+  document.body.className="quiz-active";
+  document.body.innerHTML=`<div class="quiz-app">
+    <header class="quiz-nav"><div class="quiz-nav-inner"><div class="quiz-brand"><span class="brand-mark small-mark">I</span><span>IARCO Assessment</span></div><div class="timer" id="timerBox"><span class="timer-label">TIME LEFT</span><strong id="time">--:--</strong></div></div></header>
+    <main class="quiz-main"><section class="quiz-intro-card"><div><div class="eyebrow">SECURE ASSESSMENT</div><h1>Answer each question carefully</h1><p>Questions and options have been randomized for this attempt.</p></div><div class="variant-pill">${esc(quiz.variant_id)} <span>•</span> ${quiz.questions.length} Questions</div></section>
+    <div class="progress-wrap"><div class="progress-row"><span id="progressText">0 of ${quiz.questions.length} answered</span><span>${esc(quiz.time_limit_minutes)} min assessment</span></div><div class="progress-track"><div id="progressBar" class="progress-bar" style="width:0%"></div></div></div>
+    <form id="form">${quiz.questions.map((q,i)=>`<section class="question-card" id="question_${esc(q.id)}"><div class="question-top"><span class="question-index">${String(i+1).padStart(2,"0")}</span><span class="question-type">${q.type==='single'?'Single choice':q.type==='multi'?'Multiple choice':'Short answer'}</span></div><h2>${esc(q.question)}</h2><div class="answer-list">${q.type==="single"?q.options.map((o,j)=>`<label class="option"><input type="radio" name="q_${esc(q.id)}" value="${esc(o)}"><span class="option-key">${String.fromCharCode(65+j)}</span><span>${esc(o)}</span></label>`).join(""):q.type==="multi"?q.options.map((o,j)=>`<label class="option"><input type="checkbox" name="q_${esc(q.id)}" value="${esc(o)}"><span class="option-key">${String.fromCharCode(65+j)}</span><span>${esc(o)}</span></label>`).join(""):`<textarea class="answer-text" name="q_${esc(q.id)}" maxlength="500" placeholder="Type your answer here..."></textarea>`}</div></section>`).join("")}<div class="submit-bar"><div><strong>Ready to submit?</strong><span>Review your answers before finishing.</span></div><button type="submit" class="btn gold">Submit Assessment <span>→</span></button></div></form></main></div>`;
+  const form=document.querySelector("#form");
+  form.onsubmit=e=>{e.preventDefault();if(confirm("Submit your assessment now?"))submit("MANUAL")};
+  form.addEventListener("change",updateProgress);form.addEventListener("input",updateProgress);updateProgress();
+}
+
+function updateProgress(){
+  if(!quiz)return;let answered=0;
+  for(const q of quiz.questions){const els=[...document.querySelectorAll(`[name="q_${CSS.escape(q.id)}"]`)];if(q.type==="multi"?els.some(x=>x.checked):q.type==="text"?String(els[0]?.value??"").trim().length>0:els.some(x=>x.checked))answered++;}
+  const pct=Math.round(answered/quiz.questions.length*100);const t=document.querySelector("#progressText"),b=document.querySelector("#progressBar");if(t)t.textContent=`${answered} of ${quiz.questions.length} answered`;if(b)b.style.width=`${pct}%`;
+}
+
+function answers(){
+  const o={};for(const q of quiz.questions){const a=[...document.querySelectorAll(`[name="q_${CSS.escape(q.id)}"]`)];o[q.id]=q.type==="multi"?a.filter(x=>x.checked).map(x=>x.value):q.type==="text"?(a[0]?.value??""):(a.find(x=>x.checked)?.value??"");}return o;
+}
 function formatSeconds(sec){sec=Math.max(0,Number(sec)||0);return `${Math.floor(sec/60)} min ${String(sec%60).padStart(2,"0")} sec`}
 function startTimer(){let s=(quiz.time_limit_minutes||15)*60;const tick=()=>{const e=document.querySelector("#time"),box=document.querySelector("#timerBox");if(!e)return;e.textContent=`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;if(box)box.classList.toggle("critical",s<=15);if(s<=0){clearInterval(timer);submit("TIMEOUT");return}s--};tick();timer=setInterval(tick,1000)}
-function guards(){const b=e=>e.preventDefault();for(const n of ["contextmenu","copy","cut","selectstart"])document.addEventListener(n,b);document.addEventListener("visibilitychange",()=>{if(document.hidden&&!submitting)violate("VISIBILITY_CHANGE")});window.addEventListener("blur",()=>{if(!submitting)violate("WINDOW_BLUR")});document.addEventListener("keydown",e=>{const k=String(e.key ?? "").toLowerCase();if(e.key==="F12"||((e.ctrlKey||e.metaKey)&&["a","c","u","s","p"].includes(k))||(e.ctrlKey&&e.shiftKey&&["i","j","c"].includes(k))){e.preventDefault();if(!submitting)violate("BLOCKED_SHORTCUT")}})}
-async function violate(reason){if(submitting)return;violations++;try{await api("violation",{attempt_id:attemptId,email:user.email,reason})}catch{}alert(`${user.name||user.email}, you tried to do cheating. This is recorded.`);if(violations>=2)submit("CHEATING")}
-async function getAsset(year,asset){const r=await fetch(`${CERT_API}?action=certificate_asset&year=${encodeURIComponent(year)}&asset=${encodeURIComponent(asset)}`);if(!r.ok)throw Error(`Certificate asset unavailable: ${asset}`);return await r.arrayBuffer()}
-function qrDataUrl(text){return new Promise((resolve,reject)=>{const q=document.getElementById("qrcode");q.innerHTML="";try{new QRCode(q,{text,width:90,height:90,correctLevel:QRCode.CorrectLevel.H});setTimeout(()=>{const c=q.querySelector("canvas"),img=q.querySelector("img");if(c)return resolve(c.toDataURL("image/png"));if(img)return resolve(img.src);reject(Error("QR generation failed"))},250)}catch(e){reject(e)}})}
-async function generateCertificatePdf(score,total,percentile,timeTaken,duration){if(!window.PDFLib||!window.fontkit)throw Error("Certificate PDF libraries did not load");const year=String(user.years||new Date().getFullYear()),templateUrl=await api("certificate_info",{year});const bytes=await getAsset(year,"template");const pdf=await PDFLib.PDFDocument.load(bytes);pdf.registerFontkit(window.fontkit);const [font1,font2]=await Promise.all([getAsset(year,"greatvibes"),getAsset(year,"ptsans")]);const GreatVibes=await pdf.embedFont(font1),PtSans=await pdf.embedFont(font2);const page=pdf.getPages()[0];const studentId=String(user.participant_id||user.id||"");const name=String(user.name||"");const school=String(user.school||user.institution||"");const role=String(user.role||user.category||"");const date=String(user.date||"");const fsN=35,fsP=15,textWidthN=GreatVibes.widthOfTextAtSize(name,fsN),textHeightN=GreatVibes.heightAtSize(fsN);page.drawText(name,{x:page.getWidth()/2-textWidthN/2,y:page.getHeight()/1.57-textHeightN/2,size:fsN,font:GreatVibes});const textWidthS=PtSans.widthOfTextAtSize(school,fsP),textHeightS=PtSans.heightAtSize(fsP);page.drawText(school,{x:page.getWidth()/2-textWidthS/2,y:page.getHeight()/1.9-textHeightS/2,size:fsP,font:PtSans});page.drawText(studentId,{x:700,y:500,size:9});page.drawText(role+" Category",{x:490,y:283,size:14});page.drawText(date,{x:530,y:260,size:14});const qr=await qrDataUrl(`ID: ${studentId}\nName: ${name}\nInstitute: ${school}\nCategory: ${role}\nYear: ${year}\nScore: ${score}/${total}\nPercentile: ${Number(percentile).toFixed(2)}%\nAssessment Time: ${formatSeconds(timeTaken)}\nTotal Duration: ${duration} minutes\nVerify at: https://cert.iarco.org`);const qrBytes=await fetch(qr).then(r=>r.arrayBuffer());const qrImg=await pdf.embedPng(qrBytes);page.drawImage(qrImg,{x:700,y:400,width:90,height:90});pdf.setTitle(`Certificate | ${name} | ${year}`);pdf.setAuthor("IARCO");pdf.setSubject("IARCO Participation Certificate");pdf.setKeywords(["IARCO","certificate","participation"]);const out=await pdf.save();return {base64:bytesToBase64(out),year,template:templateUrl}}
+
+function guards(){
+  const b=e=>e.preventDefault();for(const n of ["contextmenu","copy","cut","selectstart"])document.addEventListener(n,b);
+  document.addEventListener("visibilitychange",()=>{if(document.hidden&&!submitting)violate("VISIBILITY_CHANGE")});
+  window.addEventListener("blur",()=>{if(!submitting)violate("WINDOW_BLUR")});
+  document.addEventListener("keydown",e=>{const k=String(e.key??"").toLowerCase();if(e.key==="F12"||((e.ctrlKey||e.metaKey)&&["a","c","u","s","p"].includes(k))||(e.ctrlKey&&e.shiftKey&&["i","j","c"].includes(k))){e.preventDefault();if(!submitting)violate("BLOCKED_SHORTCUT")}});
+}
+async function violate(reason){if(submitting)return;violations++;try{await api("violation",{attempt_id:attemptId,email:safeEmail(),reason})}catch{}alert(`${user?.name||safeEmail()}, you tried to do cheating. This is recorded.`);if(violations>=2)submit("CHEATING")}
+
+async function getAsset(year,asset){const r=await fetch(`${CERT_API}?action=certificate_asset&year=${encodeURIComponent(year)}&asset=${encodeURIComponent(asset)}`);if(!r.ok)throw Error(`Certificate asset unavailable (${asset}, HTTP ${r.status})`);return await r.arrayBuffer()}
+
+function ensureQrContainer(){let q=document.getElementById("qrcode");if(!q){q=document.createElement("div");q.id="qrcode";q.setAttribute("aria-hidden","true");q.style.cssText="position:fixed;left:-10000px;top:-10000px;width:100px;height:100px;overflow:hidden;";document.body.appendChild(q)}return q}
+function qrDataUrl(text){return new Promise((resolve,reject)=>{const q=ensureQrContainer();q.innerHTML="";try{if(typeof QRCode!=="function")throw Error("QR code library did not load");new QRCode(q,{text,width:90,height:90,correctLevel:QRCode.CorrectLevel.H});setTimeout(()=>{const c=q.querySelector("canvas"),img=q.querySelector("img");if(c)return resolve(c.toDataURL("image/png"));if(img)return resolve(img.src);reject(Error("QR generation failed"))},300)}catch(e){reject(e)}})}
 function bytesToBase64(bytes){let binary="";const chunk=0x8000;for(let i=0;i<bytes.length;i+=chunk)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+chunk,bytes.length)));return btoa(binary)}
-async function submit(reason){if(submitting)return;submitting=true;clearInterval(timer);const timeTaken=Math.max(0,Math.round((Date.now()-startedAt)/1000));try{const r=await api("submit",{attempt_id:attemptId,email:user.email,answers:answers(),time_taken:timeTaken,reason,variant_id:quiz.variant_id});let emailStatus=r.email_status||"PENDING_CERTIFICATE",certificateFile="";if(reason!=="CHEATING"){try{const cert=await generateCertificatePdf(r.score,r.total_questions,r.percentile,r.time_taken,r.duration_minutes);const sent=await api("certificate_upload",{attempt_id:attemptId,email:user.email,certificate_pdf_base64:cert.base64});emailStatus=sent.email_status;certificateFile=sent.certificate_file||""}catch(certErr){emailStatus="FAILED";alert("Assessment saved, but certificate generation/email failed. Admin can inspect the error and retry when a certificate file is available.\n\n"+certErr.message)}}const s={status:r.status||"COMPLETED",attempt_id:attemptId,score:r.score,total_questions:r.total_questions,percentile:r.percentile,submitted_at:r.submitted_at,time_taken:r.time_taken,duration_minutes:r.duration_minutes,email_status:emailStatus,certificate_file:certificateFile};save(s);document.body.className="";document.body.innerHTML=`<main class=shell><div class=card><h1 class=brand>Submission Complete</h1><div class="msg success"><div class=score>${esc(r.score)}/${esc(r.total_questions)}</div>Percentile: <b>${Number(r.percentile).toFixed(2)}%</b><br>Time taken: <b>${formatSeconds(r.time_taken)}</b><br>Total duration: <b>${esc(r.duration_minutes)} minutes</b><br>Certificate email: <b>${esc(emailStatus)}</b></div></div></main>`}catch(e){submitting=false;alert(e.message);startTimer()}}
-try{user=JSON.parse(localStorage.getItem("iarco_quiz_user")||"null")}catch{}user?home():login();
+
+async function generateCertificatePdf(score,total,percentile,timeTaken,duration){
+  if(!window.PDFLib)throw Error("PDF library did not load. Check the CDN connection.");
+  const year=String(user?.years||new Date().getFullYear());
+  const info=await api("certificate_info",{year});
+  if(!info?.url)throw Error(`No certificate template is configured for ${year}.`);
+  const bytes=await getAsset(year,"template");
+  const pdf=await PDFLib.PDFDocument.load(bytes);
+  const page=pdf.getPages()[0];
+  const studentId=String(user?.participant_id||user?.id||"");
+  const name=String(user?.name||"");const school=String(user?.school||user?.institution||"");const role=String(user?.role||user?.category||"");const date=String(user?.date||"");
+  let GreatVibes=null,PtSans=null;
+  if(window.fontkit){
+    try{pdf.registerFontkit(window.fontkit);const [font1,font2]=await Promise.all([getAsset(year,"greatvibes"),getAsset(year,"ptsans")]);GreatVibes=await pdf.embedFont(font1);PtSans=await pdf.embedFont(font2)}catch(e){console.warn("Custom fonts unavailable; using fallback fonts.",e)}
+  }
+  const normal=await pdf.embedFont(PDFLib.StandardFonts.Helvetica);const italic=await pdf.embedFont(PDFLib.StandardFonts.HelveticaOblique);
+  const nf=GreatVibes||italic,pf=PtSans||normal;
+  const fsN=GreatVibes?35:24,fsP=15;const textWidthN=nf.widthOfTextAtSize(name,fsN);page.drawText(name,{x:page.getWidth()/2-textWidthN/2,y:page.getHeight()/1.57,size:fsN,font:nf});
+  const textWidthS=pf.widthOfTextAtSize(school,fsP);page.drawText(school,{x:page.getWidth()/2-textWidthS/2,y:page.getHeight()/1.9,size:fsP,font:pf});
+  page.drawText(studentId,{x:700,y:500,size:9,font:normal});page.drawText(role+" Category",{x:490,y:283,size:14,font:normal});page.drawText(date,{x:530,y:260,size:14,font:normal});
+  const qr=await qrDataUrl(`ID: ${studentId}\nName: ${name}\nInstitute: ${school}\nCategory: ${role}\nYear: ${year}\nScore: ${score}/${total}\nPercentile: ${Number(percentile).toFixed(2)}%\nAssessment Time: ${formatSeconds(timeTaken)}\nTotal Duration: ${duration} minutes\nVerify at: https://cert.iarco.org`);
+  const qrBytes=await fetch(qr).then(r=>r.arrayBuffer());const qrImg=await pdf.embedPng(qrBytes);page.drawImage(qrImg,{x:700,y:400,width:90,height:90});
+  pdf.setTitle(`Certificate | ${name} | ${year}`);pdf.setAuthor("IARCO");pdf.setSubject("IARCO Participation Certificate");
+  return {base64:bytesToBase64(await pdf.save())};
+}
+
+async function submit(reason){
+  if(submitting)return;submitting=true;clearInterval(timer);const timeTaken=Math.max(0,Math.round((Date.now()-startedAt)/1000));
+  try{
+    const r=await api("submit",{attempt_id:attemptId,email:safeEmail(),answers:answers(),time_taken:timeTaken,reason,variant_id:quiz.variant_id});
+    let emailStatus="PENDING_CERTIFICATE",certificateFile="",certificateError="";
+    if(reason!=="CHEATING"){
+      try{const cert=await generateCertificatePdf(r.score,r.total_questions,r.percentile,r.time_taken,r.duration_minutes);const sent=await api("certificate_upload",{attempt_id:attemptId,email:safeEmail(),certificate_pdf_base64:cert.base64});emailStatus=sent.email_status||"FAILED";certificateFile=sent.certificate_file||"";certificateError=sent.email_error||"";}
+      catch(certErr){emailStatus="FAILED";certificateError=certErr.message||"Unknown certificate error";}
+    }
+    const s={status:r.status||"COMPLETED",attempt_id:attemptId,score:r.score,total_questions:r.total_questions,percentile:r.percentile,submitted_at:r.submitted_at,time_taken:r.time_taken,duration_minutes:r.duration_minutes,email_status:emailStatus,certificate_file:certificateFile,certificate_error:certificateError};save(s);
+    setPage(`<main class="portal-shell"><section class="student-card completion-card"><div class="result-hero"><div class="result-icon">✓</div><div><div class="eyebrow">SUBMISSION RECEIVED</div><h1>Assessment saved successfully</h1><p>Your answers and result are recorded in the assessment system.</p></div></div><div class="stats-grid"><div class="stat"><span>Score</span><b>${esc(r.score)}/${esc(r.total_questions)}</b></div><div class="stat"><span>Percentile</span><b>${Number(r.percentile).toFixed(2)}%</b></div><div class="stat"><span>Time taken</span><b>${formatSeconds(r.time_taken)}</b></div><div class="stat"><span>Duration</span><b>${esc(r.duration_minutes)} min</b></div></div><div class="certificate-status ${emailStatus==='SENT'?'good':'warn'}"><strong>Certificate: ${esc(emailStatus)}</strong>${certificateFile?`<br><span>${esc(certificateFile)}</span>`:""}${certificateError?`<br><span>${esc(certificateError)}</span>`:""}${emailStatus!=='SENT'?`<br><span>The assessment itself is saved. The administrator can inspect the error and resend when the certificate file is available.</span>`:""}</div></section></main>`);
+  }catch(e){submitting=false;alert(e.message||"Submission failed");startTimer()}
+}
+
+try{user=JSON.parse(localStorage.getItem("iarco_quiz_user")||"null")}catch{user=null}
+user&&safeEmail()?home():login();
