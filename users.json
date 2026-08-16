@@ -1,6 +1,6 @@
 [
   {
-    "email": "1@1.c1",
+    "email": "mdsanaulhaqueshanto@gmail.com",
     "password": "pass",
     "name": "Demo 1 Student",
     "institution": "Demo 1 Institution",
@@ -8,10 +8,10 @@
     "category": "General"
   },
   {
-    "email": "2@1.c1",
+    "email": "trilina420@gmail.com",
     "password": "pass",
-    "name": "Demo 2 Student",
-    "institution": "Demo 2 Institution",
+    "name": "Tri lina Student",
+    "institution": "trilina420 Institution",
     "country": "Bangladesh",
     "category": "General"
   },
