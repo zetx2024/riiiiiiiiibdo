@@ -17,11 +17,12 @@ async function api(action,p={}){
 
 function protect(){
   const b=e=>e.preventDefault();
-  for(const n of ["contextmenu","copy","cut","dragstart","selectstart"]) document.addEventListener(n,b);
+  for(const n of ["contextmenu","copy","cut","dragstart","selectstart"]) document.addEventListener(n,b,{capture:true});
   document.addEventListener("keydown",e=>{
     const k=String(e.key??"").toLowerCase();
-    if(e.key==="F12"||((e.ctrlKey||e.metaKey)&&["a","c","u","s","p"].includes(k))||(e.ctrlKey&&e.shiftKey&&["i","j","c"].includes(k))) e.preventDefault();
-  });
+    const blocked=e.key==="F12"||((e.ctrlKey||e.metaKey)&&["a","c","u","s","p"].includes(k))||(e.ctrlKey&&e.shiftKey&&["i","j","c"].includes(k));
+    if(blocked)e.preventDefault();
+  },{capture:true});
 }
 
 function setPage(html,cls=""){
@@ -77,7 +78,7 @@ async function home(){
   if(!c)return;
   if(s?.status==="COMPLETED"){
     c.innerHTML=`<div class="result-hero"><div class="result-icon">✓</div><div><div class="eyebrow">ASSESSMENT COMPLETED</div><h2>Thank you for participating</h2><p>Your result has been securely recorded.</p></div></div>
-      <div class="stats-grid"><div class="stat"><span>Score</span><b>${esc(s.score)}/${esc(s.total_questions)}</b></div><div class="stat"><span>Percentile</span><b>${Number(s.percentile).toFixed(2)}%</b></div><div class="stat"><span>Time taken</span><b>${formatSeconds(s.time_taken)}</b></div><div class="stat"><span>Total duration</span><b>${esc(s.duration_minutes)} min</b></div></div>
+      <div class="stats-grid"><div class="stat"><span>Score</span><b>${esc(s.score)}/${esc(s.total_questions)}</b></div><div class="stat"><span>Time taken</span><b>${formatSeconds(s.time_taken)}</b></div><div class="stat"><span>Total duration</span><b>${esc(s.duration_minutes)} min</b></div></div>
       <div class="certificate-status ${s.email_status==='SENT'?'good':'warn'}"><strong>Certificate delivery:</strong> ${esc(s.email_status||"PENDING")}<br><span>${esc(s.certificate_file||"Certificate processing is in progress.")}</span></div>
       <p class="muted center-note">Another attempt is available only after an administrator deletes this submission.</p>`;
   }else if(s?.status==="CHEATED"){
@@ -118,6 +119,7 @@ function instructions(){
 
 async function start(){
   try{
+    try{await document.documentElement.requestFullscreen?.();}catch(_){}
     const variants=quiz.source.variants;
     const v=variants[Math.floor(Math.random()*variants.length)];
     if(!v?.id||!Array.isArray(v.questions))throw Error("Selected quiz variant is invalid.");
@@ -131,9 +133,8 @@ async function start(){
 function render(){
   document.body.className="quiz-active";
   document.body.innerHTML=`<div class="quiz-app">
-    <header class="quiz-nav"><div class="quiz-nav-inner"><div class="quiz-brand"><span class="brand-mark small-mark">I</span><span>IARCO Assessment</span></div><div class="timer" id="timerBox"><span class="timer-label">TIME LEFT</span><strong id="time">--:--</strong></div></div></header>
-    <main class="quiz-main"><section class="quiz-intro-card"><div><div class="eyebrow">SECURE ASSESSMENT</div><h1>Answer each question carefully</h1><p>Questions and options have been randomized for this attempt.</p></div><div class="variant-pill">${esc(quiz.variant_id)} <span>•</span> ${quiz.questions.length} Questions</div></section>
-    <div class="progress-wrap"><div class="progress-row"><span id="progressText">0 of ${quiz.questions.length} answered</span><span>${esc(quiz.time_limit_minutes)} min assessment</span></div><div class="progress-track"><div id="progressBar" class="progress-bar" style="width:0%"></div></div></div>
+    <header class="quiz-nav"><div class="quiz-nav-inner"><div class="quiz-brand"><span class="brand-mark small-mark">I</span><span>IARCO Assessment</span></div><div class="timer" id="timerBox"><span class="timer-label">TIME LEFT</span><strong id="time">--:--</strong></div></div><div class="assessment-progress"><div class="assessment-progress-row"><span id="progressText">0 of ${quiz.questions.length} answered</span><span>${esc(quiz.time_limit_minutes)} min assessment</span></div><div class="progress-track"><div id="progressBar" class="progress-bar" style="width:0%"></div></div></div></header>
+    <main class="quiz-main"><section class="quiz-intro-card"><div><div class="eyebrow">SECURE ASSESSMENT</div><h1>Answer each question carefully</h1><p>Questions and options have been randomized for this attempt.</p></div><div class="question-count">${quiz.questions.length} Questions</div></section>
     <form id="form">${quiz.questions.map((q,i)=>`<section class="question-card" id="question_${esc(q.id)}"><div class="question-top"><span class="question-index">${String(i+1).padStart(2,"0")}</span><span class="question-type">${q.type==='single'?'Single choice':q.type==='multi'?'Multiple choice':'Short answer'}</span></div><h2>${esc(q.question)}</h2><div class="answer-list">${q.type==="single"?q.options.map((o,j)=>`<label class="option"><input type="radio" name="q_${esc(q.id)}" value="${esc(o)}"><span class="option-key">${String.fromCharCode(65+j)}</span><span>${esc(o)}</span></label>`).join(""):q.type==="multi"?q.options.map((o,j)=>`<label class="option"><input type="checkbox" name="q_${esc(q.id)}" value="${esc(o)}"><span class="option-key">${String.fromCharCode(65+j)}</span><span>${esc(o)}</span></label>`).join(""):`<textarea class="answer-text" name="q_${esc(q.id)}" maxlength="500" placeholder="Type your answer here..."></textarea>`}</div></section>`).join("")}<div class="submit-bar"><div><strong>Ready to submit?</strong><span>Review your answers before finishing.</span></div><button type="submit" class="btn gold">Submit Assessment <span>→</span></button></div></form></main></div>`;
   const form=document.querySelector("#form");
   form.onsubmit=e=>{e.preventDefault();if(confirm("Submit your assessment now?"))submit("MANUAL")};
@@ -153,12 +154,55 @@ function formatSeconds(sec){sec=Math.max(0,Number(sec)||0);return `${Math.floor(
 function startTimer(){let s=(quiz.time_limit_minutes||15)*60;const tick=()=>{const e=document.querySelector("#time"),box=document.querySelector("#timerBox");if(!e)return;e.textContent=`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;if(box)box.classList.toggle("critical",s<=15);if(s<=0){clearInterval(timer);submit("TIMEOUT");return}s--};tick();timer=setInterval(tick,1000)}
 
 function guards(){
-  const b=e=>e.preventDefault();for(const n of ["contextmenu","copy","cut","selectstart"])document.addEventListener(n,b);
+  const b=e=>e.preventDefault();
+  for(const n of ["contextmenu","copy","cut","selectstart","dragstart"])document.addEventListener(n,b,{capture:true});
   document.addEventListener("visibilitychange",()=>{if(document.hidden&&!submitting)violate("VISIBILITY_CHANGE")});
   window.addEventListener("blur",()=>{if(!submitting)violate("WINDOW_BLUR")});
-  document.addEventListener("keydown",e=>{const k=String(e.key??"").toLowerCase();if(e.key==="F12"||((e.ctrlKey||e.metaKey)&&["a","c","u","s","p"].includes(k))||(e.ctrlKey&&e.shiftKey&&["i","j","c"].includes(k))){e.preventDefault();if(!submitting)violate("BLOCKED_SHORTCUT")}});
+  window.addEventListener("beforeunload",e=>{if(!submitting){e.preventDefault();e.returnValue="";}});
+  document.addEventListener("keydown",e=>{
+    const k=String(e.key??"").toLowerCase();
+    const blocked=e.key==="F12"||((e.ctrlKey||e.metaKey)&&["a","c","u","s","p"].includes(k))||(e.ctrlKey&&e.shiftKey&&["i","j","c"].includes(k));
+    if(blocked){e.preventDefault();if(!submitting)violate("BLOCKED_SHORTCUT");}
+  },{capture:true});
+  try{document.documentElement.requestFullscreen?.().catch(()=>{});}catch(_){}
 }
-async function violate(reason){if(submitting)return;violations++;try{await api("violation",{attempt_id:attemptId,email:safeEmail(),reason})}catch{}alert(`${user?.name||safeEmail()}, you tried to do cheating. This is recorded.`);if(violations>=2)submit("CHEATING")}
+
+function cheatingModal(reason){
+  document.querySelector("#cheatModal")?.remove();
+  const el=document.createElement("div");el.id="cheatModal";el.className="modal-backdrop cheat-backdrop";
+  el.innerHTML=`<div class="modal-card cheat-card" role="alertdialog" aria-modal="true" aria-labelledby="cheatTitle">
+    <div class="modal-top"><div class="modal-icon danger-icon">!</div><div><div class="eyebrow danger-text">SECURITY VIOLATION</div><h2 id="cheatTitle">Assessment security violation detected</h2></div></div>
+    <p class="cheat-message">${esc(user?.name||safeEmail())}, this event has already been recorded in the assessment database. This dialog cannot be cancelled or dismissed.</p>
+    <div class="violation-reason"><span>Recorded event</span><strong>${esc(reason)}</strong></div>
+    <div class="modal-actions"><button id="endCheat" class="btn danger-btn full">End this assessment</button></div>
+  </div>`;
+  document.body.appendChild(el);
+  el.querySelector("#endCheat").onclick=()=>{
+    submitting=true;clearInterval(timer);
+    try{document.exitFullscreen?.().catch(()=>{});}catch(_){}
+    save({status:"CHEATED",attempt_id:attemptId,reason});
+    setPage(`<main class="portal-shell"><section class="student-card"><div class="status-panel danger-panel"><strong>Assessment ended</strong><p>Your security violation was recorded automatically. Please contact the administrator if you believe this was an error.</p></div></section></main>`);
+  };
+  requestAnimationFrame(()=>el.querySelector("#endCheat")?.focus());
+}
+
+async function violate(reason){
+  if(submitting)return;
+  submitting=true;
+  clearInterval(timer);
+  let recorded=false;
+  try{
+    const r=await api("violation",{attempt_id:attemptId,email:safeEmail(),reason});
+    recorded=!!r.recorded;
+  }catch(_){}
+  // Keep the assessment locked even if the network is temporarily unavailable.
+  cheatingModal(recorded?reason:`${reason} (server acknowledgement pending)`);
+  if(!recorded){
+    // Retry without exposing a cancel/continue path to the student.
+    const payload=JSON.stringify({attempt_id:attemptId,email:safeEmail(),reason});
+    try{navigator.sendBeacon(`${API}?action=violation`,new Blob([payload],{type:"application/json"}));}catch(_){}
+  }
+}
 
 async function getAsset(year,asset){const r=await fetch(`${CERT_API}?action=certificate_asset&year=${encodeURIComponent(year)}&asset=${encodeURIComponent(asset)}`);if(!r.ok)throw Error(`Certificate asset unavailable (${asset}, HTTP ${r.status})`);return await r.arrayBuffer()}
 
@@ -187,7 +231,17 @@ async function generateCertificatePdf(score,total,percentile,timeTaken,duration)
   page.drawText(studentId,{x:700,y:500,size:9,font:normal});page.drawText(role+" Category",{x:490,y:283,size:14,font:normal});page.drawText(date,{x:530,y:260,size:14,font:normal});
   const qr=await qrDataUrl(`ID: ${studentId}\nName: ${name}\nInstitute: ${school}\nCategory: ${role}\nYear: ${year}\nScore: ${score}/${total}\nPercentile: ${Number(percentile).toFixed(2)}%\nAssessment Time: ${formatSeconds(timeTaken)}\nTotal Duration: ${duration} minutes\nVerify at: https://cert.iarco.org`);
   const qrBytes=await fetch(qr).then(r=>r.arrayBuffer());const qrImg=await pdf.embedPng(qrBytes);page.drawImage(qrImg,{x:700,y:400,width:90,height:90});
-  pdf.setTitle(`Certificate | ${name} | ${year}`);pdf.setAuthor("IARCO");pdf.setSubject("IARCO Participation Certificate");
+  const metadata={
+    title:`${String(user?.program||"IARCO Assessment")} Certificate - ${name}`,
+    author:"IARCO",
+    subject:`Participation Certificate | ${String(user?.program||"IARCO Assessment")}`,
+    keywords:[studentId,String(user?.program||""),String(user?.batch||""),String(user?.role||user?.category||""),year].filter(Boolean),
+    creator:"IARCO Secure Assessment Portal",
+    producer:"IARCO Secure Assessment Portal",
+    creationDate:new Date(),
+    modificationDate:new Date()
+  };
+  pdf.setTitle(metadata.title);pdf.setAuthor(metadata.author);pdf.setSubject(metadata.subject);pdf.setKeywords(metadata.keywords);pdf.setCreator(metadata.creator);pdf.setProducer(metadata.producer);pdf.setCreationDate(metadata.creationDate);pdf.setModificationDate(metadata.modificationDate);
   return {base64:bytesToBase64(await pdf.save())};
 }
 
@@ -201,7 +255,7 @@ async function submit(reason){
       catch(certErr){emailStatus="FAILED";certificateError=certErr.message||"Unknown certificate error";}
     }
     const s={status:r.status||"COMPLETED",attempt_id:attemptId,score:r.score,total_questions:r.total_questions,percentile:r.percentile,submitted_at:r.submitted_at,time_taken:r.time_taken,duration_minutes:r.duration_minutes,email_status:emailStatus,certificate_file:certificateFile,certificate_error:certificateError};save(s);
-    setPage(`<main class="portal-shell"><section class="student-card completion-card"><div class="result-hero"><div class="result-icon">✓</div><div><div class="eyebrow">SUBMISSION RECEIVED</div><h1>Assessment saved successfully</h1><p>Your answers and result are recorded in the assessment system.</p></div></div><div class="stats-grid"><div class="stat"><span>Score</span><b>${esc(r.score)}/${esc(r.total_questions)}</b></div><div class="stat"><span>Percentile</span><b>${Number(r.percentile).toFixed(2)}%</b></div><div class="stat"><span>Time taken</span><b>${formatSeconds(r.time_taken)}</b></div><div class="stat"><span>Duration</span><b>${esc(r.duration_minutes)} min</b></div></div><div class="certificate-status ${emailStatus==='SENT'?'good':'warn'}"><strong>Certificate: ${esc(emailStatus)}</strong>${certificateFile?`<br><span>${esc(certificateFile)}</span>`:""}${certificateError?`<br><span>${esc(certificateError)}</span>`:""}${emailStatus!=='SENT'?`<br><span>The assessment itself is saved. The administrator can inspect the error and resend when the certificate file is available.</span>`:""}</div></section></main>`);
+    setPage(`<main class="portal-shell"><section class="student-card completion-card"><div class="result-hero"><div class="result-icon">✓</div><div><div class="eyebrow">SUBMISSION RECEIVED</div><h1>Assessment saved successfully</h1><p>Your answers and result are recorded in the assessment system.</p></div></div><div class="stats-grid"><div class="stat"><span>Score</span><b>${esc(r.score)}/${esc(r.total_questions)}</b></div><div class="stat"><span>Time taken</span><b>${formatSeconds(r.time_taken)}</b></div><div class="stat"><span>Duration</span><b>${esc(r.duration_minutes)} min</b></div></div><div class="certificate-status ${emailStatus==='SENT'?'good':'warn'}"><strong>Certificate: ${esc(emailStatus)}</strong>${certificateFile?`<br><span>${esc(certificateFile)}</span>`:""}${certificateError?`<br><span>${esc(certificateError)}</span>`:""}${emailStatus!=='SENT'?`<br><span>The assessment itself is saved. The administrator can inspect the error and resend when the certificate file is available.</span>`:""}</div></section></main>`);
   }catch(e){submitting=false;alert(e.message||"Submission failed");startTimer()}
 }
 

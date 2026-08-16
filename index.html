@@ -2,9 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="referrer" content="no-referrer"><title>Secure Quiz Portal</title>
+<meta name="referrer" content="no-referrer"><meta name="theme-color" content="#0f172a">
+<title>Quiz Portal</title>
 <link rel="stylesheet" href="styles.css">
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-</head><body><main id="app" class="shell"></main><div id="qrcode" aria-hidden="true"></div><script src="app.js?v=20260818" defer></script></body></html>
+</head>
+<body><main id="app" class="shell"></main><div id="qrcode" aria-hidden="true"></div>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{}));}</script>
+<script src="app.js?v=20260817" defer></script></body></html>
