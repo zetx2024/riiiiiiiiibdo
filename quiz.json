@@ -1,1 +1,9 @@
-{"title":"Academic Excellence Quiz","timeLimitMinutes":1,"questions":[{"id":"q1","type":"single","text":"Which planet is known as the Red Planet?","options":["Earth","Mars","Jupiter","Venus"]},{"id":"q2","type":"multi","text":"Which are programming languages?","options":["Python","HTML","Java","CSS"]},{"id":"q3","type":"text","text":"What is the capital of Bangladesh?"}]}
+{
+  "title":"Academic Excellence Quiz",
+  "timeLimitMinutes":20,
+  "questions":[
+    {"id":"q1","type":"single","text":"Which planet is known as the Red Planet?","options":["Earth","Mars","Jupiter","Venus"]},
+    {"id":"q2","type":"multi","text":"Which are programming languages?","options":["Python","HTML","Java","CSS"]},
+    {"id":"q3","type":"text","text":"What is the capital of Bangladesh?"}
+  ]
+}
