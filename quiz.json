@@ -1,1 +1,2540 @@
-{"time_limit_minutes":15,"variants":[{"id":"V1","questions":[{"id":"q1","type":"single","question":"Which is a web browser?","options":["PHP","Chrome","MySQL","JSON"]},{"id":"q2","type":"multi","question":"Which are programming languages?","options":["PHP","Python","HTML","Java"]},{"id":"q3","type":"text","question":"What does CSS stand for?"}]},{"id":"V2","questions":[{"id":"q1","type":"single","question":"Which is a database system?","options":["MySQL","CSS","Chrome","JSON"]},{"id":"q2","type":"multi","question":"Which are programming languages?","options":["Java","Python","HTML","PHP"]},{"id":"q3","type":"text","question":"What does HTML stand for?"}]},{"id":"V3","questions":[{"id":"q1","type":"single","question":"Which technology is used for page styling?","options":["CSS","PHP","MySQL","SMTP"]},{"id":"q2","type":"multi","question":"Which are web technologies/languages?","options":["JavaScript","PHP","CSS","SMTP"]},{"id":"q3","type":"text","question":"What does PHP stand for?"}]}]}
+{
+  "time_limit_minutes": 60,
+  "variants": [
+    {
+      "id": "V1",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single",
+          "question": "In inferential statistics, what does a p-value < 0.05 typically mean?",
+          "options": [
+            "The null hypothesis is proven true.",
+            "The observed effect is unlikely under the null; reject null at 5% significance.",
+            "The result is always practically important.",
+            "The alternative hypothesis is false."
+          ],
+          "answer": "The observed effect is unlikely under the null; reject null at 5% significance."
+        },
+        {
+          "id": "q2",
+          "type": "single",
+          "question": "A researcher recruits only members of a single school club to study “social media and international competition participation.” This sampling method is likely to produce:",
+          "options": [
+            "A perfectly representative sample",
+            "Sampling bias (low external validity)",
+            "The best possible generalization to all teenagers worldwide",
+            "A randomized controlled trial"
+          ],
+          "answer": "Sampling bias (low external validity)"
+        },
+        {
+          "id": "q3",
+          "type": "single",
+          "question": "Consider the final research question you provided: “How does the use of social media contribute to skill development and encourage participation in international online competitions among high school students?” Which of these correctly identifies the independent and dependent variables if you were to form a hypothesis?",
+          "options": [
+            "Independent = skill development; Dependent = social media use",
+            "Independent = participation in competitions; Dependent = social media use",
+            "Independent = social media use; Dependent = skill development and competition participation",
+            "Independent = number of international competitions; Dependent = student grade level"
+          ],
+          "answer": "Independent = social media use; Dependent = skill development and competition participation"
+        },
+        {
+          "id": "q4",
+          "type": "single",
+          "question": "Which of these is an example of ordinal categorical data?",
+          "options": [
+            "Student ID numbers",
+            "Letter grades (A, B, C, D, F)",
+            "Eye color (blue, brown, green) with no order",
+            "Temperature in Celsius"
+          ],
+          "answer": "Letter grades (A, B, C, D, F)"
+        },
+        {
+          "id": "q5",
+          "type": "single",
+          "question": "You measure study hours and GPA for 30 students and want to test whether study hours predict GPA. Steps in proper order:",
+          "options": [
+            "Run t-test → choose test based on p-value → check normality",
+            "Choose a test at random → run it → report p-value",
+            "Check distribution/normality → choose appropriate parametric/nonparametric test or regression → run test → interpret p-value & effect size",
+            "Only compute means and stop"
+          ],
+          "answer": "Check distribution/normality → choose appropriate parametric/nonparametric test or regression → run test → interpret p-value & effect size"
+        },
+        {
+          "id": "q6",
+          "type": "single",
+          "question": "Which of these ethics considerations is essential when collecting primary data from human participants?",
+          "options": [
+            "Obtaining informed consent and ensuring confidentiality",
+            "Only using participants who will guarantee the hypothesis",
+            "Publishing participants’ names with test scores for transparency",
+            "Avoiding any form of documentation of consent"
+          ],
+          "answer": "Obtaining informed consent and ensuring confidentiality"
+        },
+        {
+          "id": "q7",
+          "type": "single",
+          "question": "A student proposes to study whether indoor LED light spectrum affects growth of houseplants. They plan two light treatments and measure height after 8 weeks. Which design is this?",
+          "options": [
+            "Cross-sectional survey",
+            "Experimental design with control of independent variable",
+            "Ethnographic fieldwork",
+            "Secondary data analysis"
+          ],
+          "answer": "Experimental design with control of independent variable"
+        },
+        {
+          "id": "q8",
+          "type": "single",
+          "question": "A study aims to explore how participants describe their experience of community gardening. Which method is most appropriate?",
+          "options": [
+            "Randomized controlled trial",
+            "Structured questionnaire with numeric scales",
+            "In-depth qualitative interviews",
+            "Secondary analysis of economic data"
+          ],
+          "answer": "In-depth qualitative interviews"
+        },
+        {
+          "id": "q9",
+          "type": "single",
+          "question": "Which probability distribution description is correct?",
+          "options": [
+            "Normal distribution: strongly skewed to the right",
+            "Non-normal distribution: always symmetric around mean",
+            "Normal distribution: symmetric, bell-shaped around the mean",
+            "Non-normal distribution: always has zero variance"
+          ],
+          "answer": "Normal distribution: symmetric, bell-shaped around the mean"
+        },
+        {
+          "id": "q10",
+          "type": "single",
+          "question": "Given data [10,12,14,16,18] (mean = 14), the variance computed as Σ(X−mean)² ÷ (n−1) equals 10. What is the standard deviation?",
+          "options": [
+            "1.00",
+            "3.16",
+            "10.00",
+            "5.00"
+          ],
+          "answer": "3.16"
+        },
+        {
+          "id": "q11",
+          "type": "single",
+          "question": "Which of these best describes secondary data?",
+          "options": [
+            "Data you design and collect yourself via experiment",
+            "Pre-existing data collected by someone else, e.g., government reports",
+            "Raw interview transcripts you personally record",
+            "Data that are always less reliable than primary data"
+          ],
+          "answer": "Pre-existing data collected by someone else, e.g., government reports"
+        },
+        {
+          "id": "q12",
+          "type": "single",
+          "question": "You have Likert-item responses (Strongly disagree–Strongly agree). What is the safest assumption about the scale when choosing analyses?",
+          "options": [
+            "Treat it as nominal and use chi-square only",
+            "Treat it as ordinal — medians and nonparametric tests are appropriate",
+            "Always treat it as ratio for parametric tests",
+            "Convert to z-scores and do structural equation modelling"
+          ],
+          "answer": "Treat it as ordinal — medians and nonparametric tests are appropriate"
+        },
+        {
+          "id": "q13",
+          "type": "single",
+          "question": "Which visualization is most appropriate for showing proportions of categorical study environments (Library, Home, Café) from a sample?",
+          "options": [
+            "Scatter plot",
+            "Pie chart or bar chart",
+            "Box plot",
+            "3D model"
+          ],
+          "answer": "Pie chart or bar chart"
+        },
+        {
+          "id": "q14",
+          "type": "single",
+          "question": "Which measurement scale best describes this variable: “Number of international online competitions a student entered in the past year”?",
+          "options": [
+            "Nominal",
+            "Ordinal",
+            "Interval",
+            "Ratio"
+          ],
+          "answer": "Ratio"
+        },
+        {
+          "id": "q15",
+          "type": "single",
+          "question": "Which of the following visualizations is least appropriate for high-cardinality categorical variables (many categories)?",
+          "options": [
+            "Bar graph (vertical bars)",
+            "Pie chart with 20+ slices",
+            "Horizontal ordered bar chart",
+            "Frequency table with sorted categories"
+          ],
+          "answer": "Pie chart with 20+ slices"
+        },
+        {
+          "id": "q16",
+          "type": "single",
+          "question": "If a hypothesis test returns a p-value = 0.03 (alpha = 0.05), the correct statistical interpretation is:",
+          "options": [
+            "There is a 3% chance the alternative hypothesis is true.",
+            "The observed data are incompatible with the null hypothesis at the 5% significance level, so reject the null.",
+            "The null hypothesis is definitely true.",
+            "The results are not statistically significant."
+          ],
+          "answer": "The observed data are incompatible with the null hypothesis at the 5% significance level, so reject the null."
+        },
+        {
+          "id": "q17",
+          "type": "single",
+          "question": "Compute the mean and median of the following test scores for five students: 70, 75, 80, 85, 90.",
+          "options": [
+            "Mean = 80; Median = 80",
+            "Mean = 70; Median = 85",
+            "Mean = 80; Median = 75",
+            "Mean = 400; Median = 80"
+          ],
+          "answer": "Mean = 80; Median = 80"
+        },
+        {
+          "id": "q18",
+          "type": "single",
+          "question": "What is a Zero Research Question as used in early-stage research planning?",
+          "options": [
+            "A question that must score zero on the importance scale",
+            "A starting, broad question to help focus and generate more specific research questions",
+            "A question only used in quantitative studies",
+            "A question that has already been answered by previous studies"
+          ],
+          "answer": "A starting, broad question to help focus and generate more specific research questions"
+        },
+        {
+          "id": "q19",
+          "type": "single",
+          "question": "Which of the following is a clear, testable null hypothesis for a two-group comparison of exam scores between group A and group B?",
+          "options": [
+            "Group A will do better on the exam.",
+            "There is no difference in mean exam scores between group A and group B.",
+            "The exam is too hard.",
+            "Students enjoy the course."
+          ],
+          "answer": "There is no difference in mean exam scores between group A and group B."
+        },
+        {
+          "id": "q20",
+          "type": "single",
+          "question": "Which of the following is not a key characteristic of a good research question?",
+          "options": [
+            "Clarity",
+            "Relevance",
+            "Ambiguity",
+            "Feasibility"
+          ],
+          "answer": "Ambiguity"
+        },
+        {
+          "id": "q21",
+          "type": "single",
+          "question": "Which citation belongs in the References section of a proposal?",
+          "options": [
+            "A list of interview questions used in the pilot study (not published)",
+            "A peer-reviewed journal article you cited in the literature review",
+            "The personal notes of the principal investigator (unpublished)",
+            "The full raw dataset you will collect (not yet collected)"
+          ],
+          "answer": "A peer-reviewed journal article you cited in the literature review"
+        },
+        {
+          "id": "q22",
+          "type": "single",
+          "question": "A student paraphrases two sentences from Wu et al. [1] but does not add a citation because they \"used their own words.\" According to good research practice, the correct action is:",
+          "options": [
+            "No citation needed — paraphrase means no attribution.",
+            "Add a citation to Wu et al. [1] and ensure paraphrase is genuinely different wording.",
+            "Add the full paragraph verbatim without citation.",
+            "Remove the paraphrase entirely; only direct quotes may be cited."
+          ],
+          "answer": "Add a citation to Wu et al. [1] and ensure paraphrase is genuinely different wording."
+        },
+        {
+          "id": "q23",
+          "type": "single",
+          "question": "Which variable type is represented by “highest educational degree” with categories {High school, Bachelor, Master, PhD}?",
+          "options": [
+            "Nominal",
+            "Ordinal",
+            "Interval",
+            "Ratio"
+          ],
+          "answer": "Ordinal"
+        },
+        {
+          "id": "q24",
+          "type": "single",
+          "question": "Which element belongs in a research proposal rather than the experimental phase?",
+          "options": [
+            "Raw data collection plan",
+            "Detailed laboratory procedures for experiments",
+            "Hypotheses and research questions",
+            "Final dataset for analysis"
+          ],
+          "answer": "Hypotheses and research questions"
+        },
+        {
+          "id": "q25",
+          "type": "single",
+          "question": "You compare the same students’ GPAs before and after an intervention (paired data). Which test is appropriate if the difference scores are normally distributed?",
+          "options": [
+            "Independent samples t-test",
+            "Paired samples t-test",
+            "Mann–Whitney U test",
+            "Chi-square test"
+          ],
+          "answer": "Paired samples t-test"
+        },
+        {
+          "id": "q26",
+          "type": "single",
+          "question": "The primary purpose of a literature review is to:",
+          "options": [
+            "Replace data collection with reading",
+            "Summarize every article ever written on a topic",
+            "Investigate specific literature to understand what’s known and identify gaps or opportunities for your research",
+            "Provide a popular-science summary for friends"
+          ],
+          "answer": "Investigate specific literature to understand what’s known and identify gaps or opportunities for your research"
+        },
+        {
+          "id": "q27",
+          "type": "single",
+          "question": "Which sentence best distinguishes a research proposal from a research paper?",
+          "options": [
+            "A proposal is the final report of findings; a paper is a plan to do the study.",
+            "A proposal persuades supervisors that the study should be done; a research paper presents completed results and contributes new knowledge.",
+            "A proposal includes discussion and conclusion; a paper never includes methodology.",
+            "There is no difference—both are identical."
+          ],
+          "answer": "A proposal persuades supervisors that the study should be done; a research paper presents completed results and contributes new knowledge."
+        },
+        {
+          "id": "q28",
+          "type": "single",
+          "question": "When preparing references for a research proposal using IEEE style, which of the following is TRUE about DOIs and the reference list?",
+          "options": [
+            "DOIs are optional and should always be in uppercase DOI:.",
+            "Include the DOI if available; format it as lowercase doi: followed by the identifier.",
+            "Never include DOIs in IEEE references — use URLs only.",
+            "Place the DOI inside square brackets at the start of the reference."
+          ],
+          "answer": "Include the DOI if available; format it as lowercase doi: followed by the identifier."
+        },
+        {
+          "id": "q29",
+          "type": "single",
+          "question": "Which statement correctly contrasts reliability and validity?",
+          "options": [
+            "Reliability is about accuracy; validity is about consistency.",
+            "Reliability refers to consistency of a measure; validity refers to whether the instrument measures what it intends to measure.",
+            "If a measure is valid, it cannot be unreliable.",
+            "Validity can be ignored if a test is reliable."
+          ],
+          "answer": "Reliability refers to consistency of a measure; validity refers to whether the instrument measures what it intends to measure."
+        },
+        {
+          "id": "q30",
+          "type": "single",
+          "question": "A study reports a 95% confidence interval for the difference in mean yield between two LED spectra as [−0.5 g, 2.3 g]. What is the correct conclusion?",
+          "options": [
+            "The difference is statistically significant (p < 0.05).",
+            "The null value (zero difference) lies inside the interval, so the difference is not statistically significant at 95% CI.",
+            "The true mean difference is exactly 0.9 g.",
+            "The result proves the white LED increases yield."
+          ],
+          "answer": "The null value (zero difference) lies inside the interval, so the difference is not statistically significant at 95% CI."
+        },
+        {
+          "id": "q31",
+          "type": "single",
+          "question": "Which procedure would you use if sample size > 50 to test for normality (according to typical guidance)?",
+          "options": [
+            "Shapiro–Wilk only",
+            "Kolmogorov–Smirnov or other large-sample tests",
+            "Wilcoxon signed-rank test",
+            "Mann–Whitney U test"
+          ],
+          "answer": "Kolmogorov–Smirnov or other large-sample tests"
+        },
+        {
+          "id": "q32",
+          "type": "single",
+          "question": "Five plants grown under full-spectrum light produced yields (g): 10, 12, 9, 11, 13. What is the sample mean yield?",
+          "options": [
+            "10 g",
+            "11 g",
+            "12 g",
+            "55 g"
+          ],
+          "answer": "11 g"
+        },
+        {
+          "id": "q33",
+          "type": "single",
+          "question": "Which experimental practice reduces selection bias and helps ensure groups are comparable at baseline?",
+          "options": [
+            "Randomization of subjects to treatment groups.",
+            "Publishing only significant results.",
+            "Not reporting dropouts.",
+            "Assigning treatments based on participant preference."
+          ],
+          "answer": "Randomization of subjects to treatment groups."
+        },
+        {
+          "id": "q34",
+          "type": "single",
+          "question": "Which statement about mean and median is true when a dataset has a large positive outlier?",
+          "options": [
+            "Mean and median always remain equal.",
+            "Mean > Median (mean is pulled right).",
+            "Mean < Median (mean is pulled left).",
+            "Median becomes undefined."
+          ],
+          "answer": "Mean > Median (mean is pulled right)."
+        },
+        {
+          "id": "q35",
+          "type": "single",
+          "question": "Which visualization is best for showing the relationship between two continuous variables?",
+          "options": [
+            "Bar graph",
+            "Scatter plot",
+            "Pie chart",
+            "Flowchart"
+          ],
+          "answer": "Scatter plot"
+        },
+        {
+          "id": "q36",
+          "type": "single",
+          "question": "Which of the following correctly pairs Type I and Type II errors?",
+          "options": [
+            "Type I = false negative; Type II = false positive",
+            "Type I = false positive; Type II = false negative",
+            "Type I = correct decision; Type II = inconclusive result",
+            "Type I and II are the same"
+          ],
+          "answer": "Type I = false positive; Type II = false negative"
+        },
+        {
+          "id": "q37",
+          "type": "single",
+          "question": "Which of the following is the correctly formatted IEEE reference for the Alrajhi et al. paper :",
+          "options": [
+            "A. A. Alrajhi, \"Impact of LED spectrum on growth and photosynthesis in lettuce,\" Plants, vol. 12, no. 3, art. 463, 2023. DOI: 10.3390/plants12030463.",
+            "Alrajhi, A.A., (2023). Impact of LED spectrum on growth and photosynthesis in lettuce. Plants, 12(3):463. https://doi.org/10.3390/plants12030463",
+            "A. A. Alrajhi et al., \"Impact of LED spectrum on growth and photosynthesis in lettuce,\" Plants, vol. 12, no. 3, art. 463, 2023. doi: 10.3390/plants12030463.",
+            "Alrajhi A A; Impact of LED spectrum on growth and photosynthesis in lettuce; Plants; 2023."
+          ],
+          "answer": "A. A. Alrajhi et al., \"Impact of LED spectrum on growth and photosynthesis in lettuce,\" Plants, vol. 12, no. 3, art. 463, 2023. doi: 10.3390/plants12030463."
+        },
+        {
+          "id": "q38",
+          "type": "single",
+          "question": "Given the dataset [10, 12, 12, 14, 15, 16, 18], what is the mode?",
+          "options": [
+            "13.86",
+            "14",
+            "12",
+            "15"
+          ],
+          "answer": "12"
+        },
+        {
+          "id": "q39",
+          "type": "single",
+          "question": "A researcher finds mean difference d̄ = 0.4, sd(diff) = 0.25, n = 10 for a paired test. The t-statistic computed as t = d̄ / (sd/√n) ≈ 5.06. What does a t ≈ 5.06 typically indicate (two-tailed)?",
+          "options": [
+            "No evidence of change",
+            "Strong evidence that difference ≠ 0 (statistically significant)",
+            "The test is invalid",
+            "The p-value must be > 0.05"
+          ],
+          "answer": "Strong evidence that difference ≠ 0 (statistically significant)"
+        },
+        {
+          "id": "q40",
+          "type": "single",
+          "question": "A researcher obtains p = 0.12 when comparing two groups. Which is a correct conclusion at α = 0.05, and what might they consider next?",
+          "options": [
+            "Reject the null — the result is significant; no further action needed.",
+            "Fail to reject the null; consider increasing sample size or checking assumptions.",
+            "Declare the alternative true because p < 0.5.",
+            "Change α to 0.2 to report significance."
+          ],
+          "answer": "Fail to reject the null; consider increasing sample size or checking assumptions."
+        },
+        {
+          "id": "q41",
+          "type": "single",
+          "question": "Which statement about reliability and validity is correct?",
+          "options": [
+            "A measure can be valid without being reliable.",
+            "Reliability is about accuracy; validity is about consistency.",
+            "A test must be reliable before it can be valid.",
+            "Validity only matters in qualitative research."
+          ],
+          "answer": "A test must be reliable before it can be valid."
+        },
+        {
+          "id": "q42",
+          "type": "single",
+          "question": "What is the primary purpose of a research question?",
+          "options": [
+            "To provide a detailed literature review.",
+            "To serve as the foundation that guides the entire research study.",
+            "To summarize the research findings.",
+            "To list the research tools and software."
+          ],
+          "answer": "To serve as the foundation that guides the entire research study."
+        },
+        {
+          "id": "q43",
+          "type": "single",
+          "question": "Which data type should be used with a pie chart?",
+          "options": [
+            "Continuous numeric measurements (e.g., height)",
+            "Categorical proportions (e.g., study environment percentages)",
+            "Two continuous variables relationship (e.g., study hours vs GPA)",
+            "Time-to-event survival data"
+          ],
+          "answer": "Categorical proportions (e.g., study environment percentages)"
+        },
+        {
+          "id": "q44",
+          "type": "single",
+          "question": "Which statement correctly contrasts qualitative and quantitative research?",
+          "options": [
+            "Qualitative research measures quantities; quantitative explores meanings.",
+            "Quantitative research uses words; qualitative uses numbers.",
+            "Qualitative research is exploratory and context-rich; quantitative focuses on measurement and statistical testing.",
+            "They are identical in data collection and analysis."
+          ],
+          "answer": "Qualitative research is exploratory and context-rich; quantitative focuses on measurement and statistical testing."
+        },
+        {
+          "id": "q45",
+          "type": "single",
+          "question": "Which sequence shows the most correct order of early steps in a typical research process?",
+          "options": [
+            "Collect data → Formulate research question → Analyze data → Write report",
+            "Identify a research topic → Conduct a preliminary literature review → Formulate research question/hypothesis → Select methodology → Design plan",
+            "Write research report → Conduct literature review → Collect data → Submit",
+            "Present → Collect data → Interpret results → Design research plan"
+          ],
+          "answer": "Identify a research topic → Conduct a preliminary literature review → Formulate research question/hypothesis → Select methodology → Design plan"
+        },
+        {
+          "id": "q46",
+          "type": "single",
+          "question": "Which statement best describes reliability vs validity?",
+          "options": [
+            "Reliability = measuring what you intend to measure; Validity = producing consistent results",
+            "Reliability = producing consistent results across repeated measures; Validity = actually measuring the concept you want to measure",
+            "Reliability and validity mean the same thing",
+            "Reliability refers to statistical significance; validity refers to practical significance"
+          ],
+          "answer": "Reliability = producing consistent results across repeated measures; Validity = actually measuring the concept you want to measure"
+        },
+        {
+          "id": "q47",
+          "type": "single",
+          "question": "Which of the following is a measure of dispersion?",
+          "options": [
+            "Mode",
+            "Mean",
+            "Standard deviation",
+            "Proportion"
+          ],
+          "answer": "Standard deviation"
+        },
+        {
+          "id": "q48",
+          "type": "single",
+          "question": "Which of the following best defines research?",
+          "options": [
+            "A random collection of facts for a school project",
+            "A systematic process of investigating and analyzing information to answer questions, solve problems, or generate new knowledge",
+            "Copying existing reports and combining them into one document",
+            "Giving presentations about what other people discovered"
+          ],
+          "answer": "A systematic process of investigating and analyzing information to answer questions, solve problems, or generate new knowledge"
+        },
+        {
+          "id": "q49",
+          "type": "single",
+          "question": "A researcher wants to compare the average number of competitions entered by students who actively use social media for skill-building versus those who do not. Which statistical test is most appropriate (assuming normality and equal variances)?",
+          "options": [
+            "Chi-square test",
+            "Independent-samples t-test",
+            "One-way ANOVA with three unrelated groups",
+            "Pearson correlation coefficient"
+          ],
+          "answer": "Independent-samples t-test"
+        },
+        {
+          "id": "q50",
+          "type": "single",
+          "question": "Which component of a proposal explains why the chosen methods are appropriate and how data will be analyzed?",
+          "options": [
+            "Title page",
+            "Methodology section",
+            "Acknowledgments",
+            "References"
+          ],
+          "answer": "Methodology section"
+        },
+        {
+          "id": "q51",
+          "type": "single",
+          "question": "An observational study finds a positive correlation between time spent watching YouTube tutorials and coding skill scores. Which statement is correct?",
+          "options": [
+            "You can conclude YouTube watching causes improved coding skills.",
+            "You can conclude coding skills cause people to watch YouTube.",
+            "Correlation does not imply causation; further experimental or longitudinal study is needed to infer causality.",
+            "The correlation proves that tutorials are always accurate."
+          ],
+          "answer": "Correlation does not imply causation; further experimental or longitudinal study is needed to infer causality."
+        },
+        {
+          "id": "q52",
+          "type": "single",
+          "question": "A researcher studies lettuce yield under two LED spectra: full-spectrum white and red-blue mix. Which of the following correctly identifies the independent and dependent variables?",
+          "options": [
+            "IV = lettuce yield; DV = LED spectrum.",
+            "IV = LED spectrum; DV = lettuce yield.",
+            "IV = growth medium; DV = LED spectrum.",
+            "IV = sample size; DV = LED spectrum."
+          ],
+          "answer": "IV = LED spectrum; DV = lettuce yield."
+        },
+        {
+          "id": "q53",
+          "type": "single",
+          "question": "If a study reports a p-value of 0.03 for the effect of social media on participation, which is the correct interpretation?",
+          "options": [
+            "There is a 3% chance the null hypothesis is true.",
+            "There is a 3% probability of obtaining the observed data (or more extreme) if the null hypothesis is true.",
+            "The alternative hypothesis is definitely true.",
+            "The results are practically important."
+          ],
+          "answer": "There is a 3% probability of obtaining the observed data (or more extreme) if the null hypothesis is true."
+        },
+        {
+          "id": "q54",
+          "type": "single",
+          "question": "Which section of a research proposal should briefly summarize key aims, methods, and expected outcomes?",
+          "options": [
+            "Title",
+            "Literature review",
+            "Abstract",
+            "References"
+          ],
+          "answer": "Abstract"
+        },
+        {
+          "id": "q55",
+          "type": "single",
+          "question": "A survey uses a Likert scale (Strongly disagree → Strongly agree). What level of measurement is this typically considered?",
+          "options": [
+            "Nominal",
+            "Ordinal",
+            "Interval with equal units guaranteed",
+            "Ratio with a true zero"
+          ],
+          "answer": "Ordinal"
+        },
+        {
+          "id": "q56",
+          "type": "single",
+          "question": "Which of the following is not a primary purpose of a literature review?",
+          "options": [
+            "Identifying gaps in existing research",
+            "Contextualizing the research problem",
+            "Replicating the exact text of prior studies verbatim",
+            "Understanding methodologies used by others"
+          ],
+          "answer": "Replicating the exact text of prior studies verbatim"
+        },
+        {
+          "id": "q57",
+          "type": "single",
+          "question": "In the Jemmy social-media scenario: “How are high school students using social media and does it influence their participation in international activities?” — identify the most likely independent and dependent variables.",
+          "options": [
+            "Independent: Participation in international activities; Dependent: Use of social media",
+            "Independent: Use of social media platforms (YouTube, Discord, etc.); Dependent: Development of skills / participation in international competitions",
+            "Independent: Students’ school subject; Dependent: Country of residence",
+            "Independent: Time of day; Dependent: Platform logo color"
+          ],
+          "answer": "Independent: Use of social media platforms (YouTube, Discord, etc.); Dependent: Development of skills / participation in international competitions"
+        },
+        {
+          "id": "q58",
+          "type": "single",
+          "question": "Which test is most appropriate to check normality for a dataset of 30 observations?",
+          "options": [
+            "Kolmogorov–Smirnov test",
+            "Wilcoxon signed-rank test",
+            "Shapiro–Wilk test",
+            "Chi-square test"
+          ],
+          "answer": "Shapiro–Wilk test"
+        },
+        {
+          "id": "q59",
+          "type": "single",
+          "question": "Which of these is most essential from an ethics perspective when conducting interviews with high school students about online competition participation?",
+          "options": [
+            "Using complex legal documents to frighten them into participation",
+            "Obtaining informed consent (and parental consent if minors), ensuring privacy, and explaining voluntary participation and risks/benefits",
+            "Publishing full names and transcripts without permission because it’s “for research”",
+            "Requiring participation as part of class grade without alternative"
+          ],
+          "answer": "Obtaining informed consent (and parental consent if minors), ensuring privacy, and explaining voluntary participation and risks/benefits"
+        },
+        {
+          "id": "q60",
+          "type": "single",
+          "question": "Which of the following is a primary data source?",
+          "options": [
+            "National census dataset downloaded from government website",
+            "A meta-analysis published in a journal",
+            "Observations you collect in person for your study",
+            "A literature review chapter from a thesis"
+          ],
+          "answer": "Observations you collect in person for your study"
+        },
+        {
+          "id": "q61",
+          "type": "single",
+          "question": "Which method is most appropriate if a researcher wants to measure how many hours students spend on social media per week and relate that to a standardized skill score?",
+          "options": [
+            "Qualitative (in-depth interviews only)",
+            "Quantitative (surveys and standardized tests)",
+            "Archival literary analysis only",
+            "Purely observational field notes with no numbers"
+          ],
+          "answer": "Quantitative (surveys and standardized tests)"
+        },
+        {
+          "id": "q62",
+          "type": "single",
+          "question": "Why is a research proposal written before conducting the full study?",
+          "options": [
+            "To guarantee the research will be published",
+            "To provide a clear plan of goals, methods, timeline and resources",
+            "To replace the final report",
+            "To avoid doing a literature review"
+          ],
+          "answer": "To provide a clear plan of goals, methods, timeline and resources"
+        },
+        {
+          "id": "q63",
+          "type": "single",
+          "question": "A sample of 25 students has a sample mean score of 70 and a sample standard deviation of 10. Using a t-critical value of 2.064 for 95% confidence (df = 24), what is the 95% confidence interval for the population mean?",
+          "options": [
+            "(66.5, 73.5)",
+            "(65.87, 74.13)",
+            "(60.0, 80.0)",
+            "(69.0, 71.0)"
+          ],
+          "answer": "(65.87, 74.13)"
+        },
+        {
+          "id": "q64",
+          "type": "single",
+          "question": "Which section of the proposal most often includes a Gantt chart or schedule for tasks and milestones?",
+          "options": [
+            "Introduction",
+            "Methodology",
+            "Timeline (or Project Timeline)",
+            "References"
+          ],
+          "answer": "Timeline (or Project Timeline)"
+        },
+        {
+          "id": "q65",
+          "type": "single",
+          "question": "For two independent groups with non-normal distributions, which test is most suitable to compare central tendency?",
+          "options": [
+            "Independent samples t-test",
+            "Paired samples t-test",
+            "Mann–Whitney U test",
+            "ANOVA"
+          ],
+          "answer": "Mann–Whitney U test"
+        },
+        {
+          "id": "q66",
+          "type": "single",
+          "question": "Which statement about parametric vs nonparametric tests is correct?",
+          "options": [
+            "Parametric tests never require normality.",
+            "Nonparametric tests assume data are normally distributed.",
+            "Parametric tests generally have more statistical power if assumptions hold.",
+            "Nonparametric tests always provide effect size measures directly."
+          ],
+          "answer": "Parametric tests generally have more statistical power if assumptions hold."
+        },
+        {
+          "id": "q67",
+          "type": "single",
+          "question": "Given sample test scores: 62, 70, 68, 75, 65. What is the mean score?",
+          "options": [
+            "68.0",
+            "67.6",
+            "69.0",
+            "66.8"
+          ],
+          "answer": "68.0"
+        },
+        {
+          "id": "q68",
+          "type": "single",
+          "question": "A researcher plans to compare mean test scores between two independent groups. Which statistical test is usually appropriate (assuming normality and equal variances)?",
+          "options": [
+            "Chi-square test",
+            "Independent samples t-test",
+            "One-way ANOVA for three groups only",
+            "Pearson correlation"
+          ],
+          "answer": "Independent samples t-test"
+        },
+        {
+          "id": "q69",
+          "type": "single",
+          "question": "Which statistical test is most appropriate to compare mean lettuce yields between two independent groups (full-spectrum vs red-blue), when sample sizes are small and data are approximately normally distributed?",
+          "options": [
+            "Paired t-test",
+            "Independent (two-sample) t-test",
+            "Chi-square test",
+            "Pearson correlation"
+          ],
+          "answer": "Independent (two-sample) t-test"
+        },
+        {
+          "id": "q70",
+          "type": "single",
+          "question": "Interpretation of a p-value of 0.03 (with α = 0.05):",
+          "options": [
+            "The null hypothesis is definitely true.",
+            "There is a 3% probability the alternative hypothesis is true.",
+            "There is strong evidence against the null, so reject the null at α = 0.05.",
+            "The effect is practically important."
+          ],
+          "answer": "There is strong evidence against the null, so reject the null at α = 0.05."
+        }
+      ]
+    },
+    {
+      "id": "V2",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single",
+          "question": "In inferential statistics, what does a p-value < 0.05 typically mean?",
+          "options": [
+            "The observed effect is unlikely under the null; reject null at 5% significance.",
+            "The null hypothesis is proven true.",
+            "The alternative hypothesis is false.",
+            "The result is always practically important."
+          ],
+          "answer": "The observed effect is unlikely under the null; reject null at 5% significance."
+        },
+        {
+          "id": "q2",
+          "type": "single",
+          "question": "A researcher recruits only members of a single school club to study “social media and international competition participation.” This sampling method is likely to produce:",
+          "options": [
+            "A randomized controlled trial",
+            "A perfectly representative sample",
+            "Sampling bias (low external validity)",
+            "The best possible generalization to all teenagers worldwide"
+          ],
+          "answer": "Sampling bias (low external validity)"
+        },
+        {
+          "id": "q3",
+          "type": "single",
+          "question": "Consider the final research question you provided: “How does the use of social media contribute to skill development and encourage participation in international online competitions among high school students?” Which of these correctly identifies the independent and dependent variables if you were to form a hypothesis?",
+          "options": [
+            "Independent = participation in competitions; Dependent = social media use",
+            "Independent = social media use; Dependent = skill development and competition participation",
+            "Independent = skill development; Dependent = social media use",
+            "Independent = number of international competitions; Dependent = student grade level"
+          ],
+          "answer": "Independent = social media use; Dependent = skill development and competition participation"
+        },
+        {
+          "id": "q4",
+          "type": "single",
+          "question": "Which of these is an example of ordinal categorical data?",
+          "options": [
+            "Letter grades (A, B, C, D, F)",
+            "Student ID numbers",
+            "Temperature in Celsius",
+            "Eye color (blue, brown, green) with no order"
+          ],
+          "answer": "Letter grades (A, B, C, D, F)"
+        },
+        {
+          "id": "q5",
+          "type": "single",
+          "question": "You measure study hours and GPA for 30 students and want to test whether study hours predict GPA. Steps in proper order:",
+          "options": [
+            "Run t-test → choose test based on p-value → check normality",
+            "Check distribution/normality → choose appropriate parametric/nonparametric test or regression → run test → interpret p-value & effect size",
+            "Only compute means and stop",
+            "Choose a test at random → run it → report p-value"
+          ],
+          "answer": "Check distribution/normality → choose appropriate parametric/nonparametric test or regression → run test → interpret p-value & effect size"
+        },
+        {
+          "id": "q6",
+          "type": "single",
+          "question": "Which of these ethics considerations is essential when collecting primary data from human participants?",
+          "options": [
+            "Only using participants who will guarantee the hypothesis",
+            "Avoiding any form of documentation of consent",
+            "Obtaining informed consent and ensuring confidentiality",
+            "Publishing participants’ names with test scores for transparency"
+          ],
+          "answer": "Obtaining informed consent and ensuring confidentiality"
+        },
+        {
+          "id": "q7",
+          "type": "single",
+          "question": "A student proposes to study whether indoor LED light spectrum affects growth of houseplants. They plan two light treatments and measure height after 8 weeks. Which design is this?",
+          "options": [
+            "Experimental design with control of independent variable",
+            "Cross-sectional survey",
+            "Secondary data analysis",
+            "Ethnographic fieldwork"
+          ],
+          "answer": "Experimental design with control of independent variable"
+        },
+        {
+          "id": "q8",
+          "type": "single",
+          "question": "A study aims to explore how participants describe their experience of community gardening. Which method is most appropriate?",
+          "options": [
+            "Structured questionnaire with numeric scales",
+            "In-depth qualitative interviews",
+            "Randomized controlled trial",
+            "Secondary analysis of economic data"
+          ],
+          "answer": "In-depth qualitative interviews"
+        },
+        {
+          "id": "q9",
+          "type": "single",
+          "question": "Which probability distribution description is correct?",
+          "options": [
+            "Non-normal distribution: always symmetric around mean",
+            "Normal distribution: symmetric, bell-shaped around the mean",
+            "Normal distribution: strongly skewed to the right",
+            "Non-normal distribution: always has zero variance"
+          ],
+          "answer": "Normal distribution: symmetric, bell-shaped around the mean"
+        },
+        {
+          "id": "q10",
+          "type": "single",
+          "question": "Given data [10,12,14,16,18] (mean = 14), the variance computed as Σ(X−mean)² ÷ (n−1) equals 10. What is the standard deviation?",
+          "options": [
+            "3.16",
+            "1.00",
+            "5.00",
+            "10.00"
+          ],
+          "answer": "3.16"
+        },
+        {
+          "id": "q11",
+          "type": "single",
+          "question": "Which of these best describes secondary data?",
+          "options": [
+            "Pre-existing data collected by someone else, e.g., government reports",
+            "Data you design and collect yourself via experiment",
+            "Data that are always less reliable than primary data",
+            "Raw interview transcripts you personally record"
+          ],
+          "answer": "Pre-existing data collected by someone else, e.g., government reports"
+        },
+        {
+          "id": "q12",
+          "type": "single",
+          "question": "You have Likert-item responses (Strongly disagree–Strongly agree). What is the safest assumption about the scale when choosing analyses?",
+          "options": [
+            "Treat it as nominal and use chi-square only",
+            "Convert to z-scores and do structural equation modelling",
+            "Treat it as ordinal — medians and nonparametric tests are appropriate",
+            "Always treat it as ratio for parametric tests"
+          ],
+          "answer": "Treat it as ordinal — medians and nonparametric tests are appropriate"
+        },
+        {
+          "id": "q13",
+          "type": "single",
+          "question": "Which visualization is most appropriate for showing proportions of categorical study environments (Library, Home, Café) from a sample?",
+          "options": [
+            "Pie chart or bar chart",
+            "Scatter plot",
+            "3D model",
+            "Box plot"
+          ],
+          "answer": "Pie chart or bar chart"
+        },
+        {
+          "id": "q14",
+          "type": "single",
+          "question": "Which measurement scale best describes this variable: “Number of international online competitions a student entered in the past year”?",
+          "options": [
+            "Ratio",
+            "Nominal",
+            "Interval",
+            "Ordinal"
+          ],
+          "answer": "Ratio"
+        },
+        {
+          "id": "q15",
+          "type": "single",
+          "question": "Which of the following visualizations is least appropriate for high-cardinality categorical variables (many categories)?",
+          "options": [
+            "Bar graph (vertical bars)",
+            "Horizontal ordered bar chart",
+            "Pie chart with 20+ slices",
+            "Frequency table with sorted categories"
+          ],
+          "answer": "Pie chart with 20+ slices"
+        },
+        {
+          "id": "q16",
+          "type": "single",
+          "question": "If a hypothesis test returns a p-value = 0.03 (alpha = 0.05), the correct statistical interpretation is:",
+          "options": [
+            "The observed data are incompatible with the null hypothesis at the 5% significance level, so reject the null.",
+            "There is a 3% chance the alternative hypothesis is true.",
+            "The results are not statistically significant.",
+            "The null hypothesis is definitely true."
+          ],
+          "answer": "The observed data are incompatible with the null hypothesis at the 5% significance level, so reject the null."
+        },
+        {
+          "id": "q17",
+          "type": "single",
+          "question": "Compute the mean and median of the following test scores for five students: 70, 75, 80, 85, 90.",
+          "options": [
+            "Mean = 70; Median = 85",
+            "Mean = 80; Median = 80",
+            "Mean = 400; Median = 80",
+            "Mean = 80; Median = 75"
+          ],
+          "answer": "Mean = 80; Median = 80"
+        },
+        {
+          "id": "q18",
+          "type": "single",
+          "question": "What is a Zero Research Question as used in early-stage research planning?",
+          "options": [
+            "A question that must score zero on the importance scale",
+            "A question only used in quantitative studies",
+            "A starting, broad question to help focus and generate more specific research questions",
+            "A question that has already been answered by previous studies"
+          ],
+          "answer": "A starting, broad question to help focus and generate more specific research questions"
+        },
+        {
+          "id": "q19",
+          "type": "single",
+          "question": "Which of the following is a clear, testable null hypothesis for a two-group comparison of exam scores between group A and group B?",
+          "options": [
+            "There is no difference in mean exam scores between group A and group B.",
+            "Group A will do better on the exam.",
+            "Students enjoy the course.",
+            "The exam is too hard."
+          ],
+          "answer": "There is no difference in mean exam scores between group A and group B."
+        },
+        {
+          "id": "q20",
+          "type": "single",
+          "question": "Which of the following is not a key characteristic of a good research question?",
+          "options": [
+            "Clarity",
+            "Ambiguity",
+            "Relevance",
+            "Feasibility"
+          ],
+          "answer": "Ambiguity"
+        },
+        {
+          "id": "q21",
+          "type": "single",
+          "question": "Which citation belongs in the References section of a proposal?",
+          "options": [
+            "A peer-reviewed journal article you cited in the literature review",
+            "A list of interview questions used in the pilot study (not published)",
+            "The full raw dataset you will collect (not yet collected)",
+            "The personal notes of the principal investigator (unpublished)"
+          ],
+          "answer": "A peer-reviewed journal article you cited in the literature review"
+        },
+        {
+          "id": "q22",
+          "type": "single",
+          "question": "A student paraphrases two sentences from Wu et al. [1] but does not add a citation because they \"used their own words.\" According to good research practice, the correct action is:",
+          "options": [
+            "Add a citation to Wu et al. [1] and ensure paraphrase is genuinely different wording.",
+            "No citation needed — paraphrase means no attribution.",
+            "Remove the paraphrase entirely; only direct quotes may be cited.",
+            "Add the full paragraph verbatim without citation."
+          ],
+          "answer": "Add a citation to Wu et al. [1] and ensure paraphrase is genuinely different wording."
+        },
+        {
+          "id": "q23",
+          "type": "single",
+          "question": "Which variable type is represented by “highest educational degree” with categories {High school, Bachelor, Master, PhD}?",
+          "options": [
+            "Ordinal",
+            "Nominal",
+            "Ratio",
+            "Interval"
+          ],
+          "answer": "Ordinal"
+        },
+        {
+          "id": "q24",
+          "type": "single",
+          "question": "Which element belongs in a research proposal rather than the experimental phase?",
+          "options": [
+            "Raw data collection plan",
+            "Hypotheses and research questions",
+            "Detailed laboratory procedures for experiments",
+            "Final dataset for analysis"
+          ],
+          "answer": "Hypotheses and research questions"
+        },
+        {
+          "id": "q25",
+          "type": "single",
+          "question": "You compare the same students’ GPAs before and after an intervention (paired data). Which test is appropriate if the difference scores are normally distributed?",
+          "options": [
+            "Paired samples t-test",
+            "Independent samples t-test",
+            "Chi-square test",
+            "Mann–Whitney U test"
+          ],
+          "answer": "Paired samples t-test"
+        },
+        {
+          "id": "q26",
+          "type": "single",
+          "question": "The primary purpose of a literature review is to:",
+          "options": [
+            "Summarize every article ever written on a topic",
+            "Investigate specific literature to understand what’s known and identify gaps or opportunities for your research",
+            "Replace data collection with reading",
+            "Provide a popular-science summary for friends"
+          ],
+          "answer": "Investigate specific literature to understand what’s known and identify gaps or opportunities for your research"
+        },
+        {
+          "id": "q27",
+          "type": "single",
+          "question": "Which sentence best distinguishes a research proposal from a research paper?",
+          "options": [
+            "A proposal persuades supervisors that the study should be done; a research paper presents completed results and contributes new knowledge.",
+            "A proposal is the final report of findings; a paper is a plan to do the study.",
+            "There is no difference—both are identical.",
+            "A proposal includes discussion and conclusion; a paper never includes methodology."
+          ],
+          "answer": "A proposal persuades supervisors that the study should be done; a research paper presents completed results and contributes new knowledge."
+        },
+        {
+          "id": "q28",
+          "type": "single",
+          "question": "When preparing references for a research proposal using IEEE style, which of the following is TRUE about DOIs and the reference list?",
+          "options": [
+            "Include the DOI if available; format it as lowercase doi: followed by the identifier.",
+            "DOIs are optional and should always be in uppercase DOI:.",
+            "Place the DOI inside square brackets at the start of the reference.",
+            "Never include DOIs in IEEE references — use URLs only."
+          ],
+          "answer": "Include the DOI if available; format it as lowercase doi: followed by the identifier."
+        },
+        {
+          "id": "q29",
+          "type": "single",
+          "question": "Which statement correctly contrasts reliability and validity?",
+          "options": [
+            "Reliability refers to consistency of a measure; validity refers to whether the instrument measures what it intends to measure.",
+            "Reliability is about accuracy; validity is about consistency.",
+            "Validity can be ignored if a test is reliable.",
+            "If a measure is valid, it cannot be unreliable."
+          ],
+          "answer": "Reliability refers to consistency of a measure; validity refers to whether the instrument measures what it intends to measure."
+        },
+        {
+          "id": "q30",
+          "type": "single",
+          "question": "A study reports a 95% confidence interval for the difference in mean yield between two LED spectra as [−0.5 g, 2.3 g]. What is the correct conclusion?",
+          "options": [
+            "The null value (zero difference) lies inside the interval, so the difference is not statistically significant at 95% CI.",
+            "The difference is statistically significant (p < 0.05).",
+            "The result proves the white LED increases yield.",
+            "The true mean difference is exactly 0.9 g."
+          ],
+          "answer": "The null value (zero difference) lies inside the interval, so the difference is not statistically significant at 95% CI."
+        },
+        {
+          "id": "q31",
+          "type": "single",
+          "question": "Which procedure would you use if sample size > 50 to test for normality (according to typical guidance)?",
+          "options": [
+            "Kolmogorov–Smirnov or other large-sample tests",
+            "Shapiro–Wilk only",
+            "Mann–Whitney U test",
+            "Wilcoxon signed-rank test"
+          ],
+          "answer": "Kolmogorov–Smirnov or other large-sample tests"
+        },
+        {
+          "id": "q32",
+          "type": "single",
+          "question": "Five plants grown under full-spectrum light produced yields (g): 10, 12, 9, 11, 13. What is the sample mean yield?",
+          "options": [
+            "11 g",
+            "10 g",
+            "55 g",
+            "12 g"
+          ],
+          "answer": "11 g"
+        },
+        {
+          "id": "q33",
+          "type": "single",
+          "question": "Which experimental practice reduces selection bias and helps ensure groups are comparable at baseline?",
+          "options": [
+            "Randomization of subjects to treatment groups.",
+            "Publishing only significant results.",
+            "Assigning treatments based on participant preference.",
+            "Not reporting dropouts."
+          ],
+          "answer": "Randomization of subjects to treatment groups."
+        },
+        {
+          "id": "q34",
+          "type": "single",
+          "question": "Which statement about mean and median is true when a dataset has a large positive outlier?",
+          "options": [
+            "Mean > Median (mean is pulled right).",
+            "Mean and median always remain equal.",
+            "Median becomes undefined.",
+            "Mean < Median (mean is pulled left)."
+          ],
+          "answer": "Mean > Median (mean is pulled right)."
+        },
+        {
+          "id": "q35",
+          "type": "single",
+          "question": "Which visualization is best for showing the relationship between two continuous variables?",
+          "options": [
+            "Scatter plot",
+            "Bar graph",
+            "Flowchart",
+            "Pie chart"
+          ],
+          "answer": "Scatter plot"
+        },
+        {
+          "id": "q36",
+          "type": "single",
+          "question": "Which of the following correctly pairs Type I and Type II errors?",
+          "options": [
+            "Type I = false positive; Type II = false negative",
+            "Type I = false negative; Type II = false positive",
+            "Type I and II are the same",
+            "Type I = correct decision; Type II = inconclusive result"
+          ],
+          "answer": "Type I = false positive; Type II = false negative"
+        },
+        {
+          "id": "q37",
+          "type": "single",
+          "question": "Which of the following is the correctly formatted IEEE reference for the Alrajhi et al. paper :",
+          "options": [
+            "A. A. Alrajhi et al., \"Impact of LED spectrum on growth and photosynthesis in lettuce,\" Plants, vol. 12, no. 3, art. 463, 2023. doi: 10.3390/plants12030463.",
+            "A. A. Alrajhi, \"Impact of LED spectrum on growth and photosynthesis in lettuce,\" Plants, vol. 12, no. 3, art. 463, 2023. DOI: 10.3390/plants12030463.",
+            "Alrajhi A A; Impact of LED spectrum on growth and photosynthesis in lettuce; Plants; 2023.",
+            "Alrajhi, A.A., (2023). Impact of LED spectrum on growth and photosynthesis in lettuce. Plants, 12(3):463. https://doi.org/10.3390/plants12030463"
+          ],
+          "answer": "A. A. Alrajhi et al., \"Impact of LED spectrum on growth and photosynthesis in lettuce,\" Plants, vol. 12, no. 3, art. 463, 2023. doi: 10.3390/plants12030463."
+        },
+        {
+          "id": "q38",
+          "type": "single",
+          "question": "Given the dataset [10, 12, 12, 14, 15, 16, 18], what is the mode?",
+          "options": [
+            "12",
+            "13.86",
+            "15",
+            "14"
+          ],
+          "answer": "12"
+        },
+        {
+          "id": "q39",
+          "type": "single",
+          "question": "A researcher finds mean difference d̄ = 0.4, sd(diff) = 0.25, n = 10 for a paired test. The t-statistic computed as t = d̄ / (sd/√n) ≈ 5.06. What does a t ≈ 5.06 typically indicate (two-tailed)?",
+          "options": [
+            "Strong evidence that difference ≠ 0 (statistically significant)",
+            "No evidence of change",
+            "The p-value must be > 0.05",
+            "The test is invalid"
+          ],
+          "answer": "Strong evidence that difference ≠ 0 (statistically significant)"
+        },
+        {
+          "id": "q40",
+          "type": "single",
+          "question": "A researcher obtains p = 0.12 when comparing two groups. Which is a correct conclusion at α = 0.05, and what might they consider next?",
+          "options": [
+            "Fail to reject the null; consider increasing sample size or checking assumptions.",
+            "Reject the null — the result is significant; no further action needed.",
+            "Change α to 0.2 to report significance.",
+            "Declare the alternative true because p < 0.5."
+          ],
+          "answer": "Fail to reject the null; consider increasing sample size or checking assumptions."
+        },
+        {
+          "id": "q41",
+          "type": "single",
+          "question": "Which statement about reliability and validity is correct?",
+          "options": [
+            "A test must be reliable before it can be valid.",
+            "A measure can be valid without being reliable.",
+            "Validity only matters in qualitative research.",
+            "Reliability is about accuracy; validity is about consistency."
+          ],
+          "answer": "A test must be reliable before it can be valid."
+        },
+        {
+          "id": "q42",
+          "type": "single",
+          "question": "What is the primary purpose of a research question?",
+          "options": [
+            "To serve as the foundation that guides the entire research study.",
+            "To provide a detailed literature review.",
+            "To list the research tools and software.",
+            "To summarize the research findings."
+          ],
+          "answer": "To serve as the foundation that guides the entire research study."
+        },
+        {
+          "id": "q43",
+          "type": "single",
+          "question": "Which data type should be used with a pie chart?",
+          "options": [
+            "Categorical proportions (e.g., study environment percentages)",
+            "Continuous numeric measurements (e.g., height)",
+            "Time-to-event survival data",
+            "Two continuous variables relationship (e.g., study hours vs GPA)"
+          ],
+          "answer": "Categorical proportions (e.g., study environment percentages)"
+        },
+        {
+          "id": "q44",
+          "type": "single",
+          "question": "Which statement correctly contrasts qualitative and quantitative research?",
+          "options": [
+            "Qualitative research is exploratory and context-rich; quantitative focuses on measurement and statistical testing.",
+            "Qualitative research measures quantities; quantitative explores meanings.",
+            "They are identical in data collection and analysis.",
+            "Quantitative research uses words; qualitative uses numbers."
+          ],
+          "answer": "Qualitative research is exploratory and context-rich; quantitative focuses on measurement and statistical testing."
+        },
+        {
+          "id": "q45",
+          "type": "single",
+          "question": "Which sequence shows the most correct order of early steps in a typical research process?",
+          "options": [
+            "Identify a research topic → Conduct a preliminary literature review → Formulate research question/hypothesis → Select methodology → Design plan",
+            "Collect data → Formulate research question → Analyze data → Write report",
+            "Present → Collect data → Interpret results → Design research plan",
+            "Write research report → Conduct literature review → Collect data → Submit"
+          ],
+          "answer": "Identify a research topic → Conduct a preliminary literature review → Formulate research question/hypothesis → Select methodology → Design plan"
+        },
+        {
+          "id": "q46",
+          "type": "single",
+          "question": "Which statement best describes reliability vs validity?",
+          "options": [
+            "Reliability = producing consistent results across repeated measures; Validity = actually measuring the concept you want to measure",
+            "Reliability = measuring what you intend to measure; Validity = producing consistent results",
+            "Reliability refers to statistical significance; validity refers to practical significance",
+            "Reliability and validity mean the same thing"
+          ],
+          "answer": "Reliability = producing consistent results across repeated measures; Validity = actually measuring the concept you want to measure"
+        },
+        {
+          "id": "q47",
+          "type": "single",
+          "question": "Which of the following is a measure of dispersion?",
+          "options": [
+            "Standard deviation",
+            "Mode",
+            "Proportion",
+            "Mean"
+          ],
+          "answer": "Standard deviation"
+        },
+        {
+          "id": "q48",
+          "type": "single",
+          "question": "Which of the following best defines research?",
+          "options": [
+            "A systematic process of investigating and analyzing information to answer questions, solve problems, or generate new knowledge",
+            "A random collection of facts for a school project",
+            "Giving presentations about what other people discovered",
+            "Copying existing reports and combining them into one document"
+          ],
+          "answer": "A systematic process of investigating and analyzing information to answer questions, solve problems, or generate new knowledge"
+        },
+        {
+          "id": "q49",
+          "type": "single",
+          "question": "A researcher wants to compare the average number of competitions entered by students who actively use social media for skill-building versus those who do not. Which statistical test is most appropriate (assuming normality and equal variances)?",
+          "options": [
+            "Independent-samples t-test",
+            "Chi-square test",
+            "Pearson correlation coefficient",
+            "One-way ANOVA with three unrelated groups"
+          ],
+          "answer": "Independent-samples t-test"
+        },
+        {
+          "id": "q50",
+          "type": "single",
+          "question": "Which component of a proposal explains why the chosen methods are appropriate and how data will be analyzed?",
+          "options": [
+            "Methodology section",
+            "Title page",
+            "References",
+            "Acknowledgments"
+          ],
+          "answer": "Methodology section"
+        },
+        {
+          "id": "q51",
+          "type": "single",
+          "question": "An observational study finds a positive correlation between time spent watching YouTube tutorials and coding skill scores. Which statement is correct?",
+          "options": [
+            "Correlation does not imply causation; further experimental or longitudinal study is needed to infer causality.",
+            "You can conclude YouTube watching causes improved coding skills.",
+            "The correlation proves that tutorials are always accurate.",
+            "You can conclude coding skills cause people to watch YouTube."
+          ],
+          "answer": "Correlation does not imply causation; further experimental or longitudinal study is needed to infer causality."
+        },
+        {
+          "id": "q52",
+          "type": "single",
+          "question": "A researcher studies lettuce yield under two LED spectra: full-spectrum white and red-blue mix. Which of the following correctly identifies the independent and dependent variables?",
+          "options": [
+            "IV = LED spectrum; DV = lettuce yield.",
+            "IV = lettuce yield; DV = LED spectrum.",
+            "IV = sample size; DV = LED spectrum.",
+            "IV = growth medium; DV = LED spectrum."
+          ],
+          "answer": "IV = LED spectrum; DV = lettuce yield."
+        },
+        {
+          "id": "q53",
+          "type": "single",
+          "question": "If a study reports a p-value of 0.03 for the effect of social media on participation, which is the correct interpretation?",
+          "options": [
+            "There is a 3% probability of obtaining the observed data (or more extreme) if the null hypothesis is true.",
+            "There is a 3% chance the null hypothesis is true.",
+            "The results are practically important.",
+            "The alternative hypothesis is definitely true."
+          ],
+          "answer": "There is a 3% probability of obtaining the observed data (or more extreme) if the null hypothesis is true."
+        },
+        {
+          "id": "q54",
+          "type": "single",
+          "question": "Which section of a research proposal should briefly summarize key aims, methods, and expected outcomes?",
+          "options": [
+            "Abstract",
+            "Title",
+            "References",
+            "Literature review"
+          ],
+          "answer": "Abstract"
+        },
+        {
+          "id": "q55",
+          "type": "single",
+          "question": "A survey uses a Likert scale (Strongly disagree → Strongly agree). What level of measurement is this typically considered?",
+          "options": [
+            "Ordinal",
+            "Nominal",
+            "Ratio with a true zero",
+            "Interval with equal units guaranteed"
+          ],
+          "answer": "Ordinal"
+        },
+        {
+          "id": "q56",
+          "type": "single",
+          "question": "Which of the following is not a primary purpose of a literature review?",
+          "options": [
+            "Replicating the exact text of prior studies verbatim",
+            "Identifying gaps in existing research",
+            "Understanding methodologies used by others",
+            "Contextualizing the research problem"
+          ],
+          "answer": "Replicating the exact text of prior studies verbatim"
+        },
+        {
+          "id": "q57",
+          "type": "single",
+          "question": "In the Jemmy social-media scenario: “How are high school students using social media and does it influence their participation in international activities?” — identify the most likely independent and dependent variables.",
+          "options": [
+            "Independent: Use of social media platforms (YouTube, Discord, etc.); Dependent: Development of skills / participation in international competitions",
+            "Independent: Participation in international activities; Dependent: Use of social media",
+            "Independent: Time of day; Dependent: Platform logo color",
+            "Independent: Students’ school subject; Dependent: Country of residence"
+          ],
+          "answer": "Independent: Use of social media platforms (YouTube, Discord, etc.); Dependent: Development of skills / participation in international competitions"
+        },
+        {
+          "id": "q58",
+          "type": "single",
+          "question": "Which test is most appropriate to check normality for a dataset of 30 observations?",
+          "options": [
+            "Shapiro–Wilk test",
+            "Kolmogorov–Smirnov test",
+            "Chi-square test",
+            "Wilcoxon signed-rank test"
+          ],
+          "answer": "Shapiro–Wilk test"
+        },
+        {
+          "id": "q59",
+          "type": "single",
+          "question": "Which of these is most essential from an ethics perspective when conducting interviews with high school students about online competition participation?",
+          "options": [
+            "Obtaining informed consent (and parental consent if minors), ensuring privacy, and explaining voluntary participation and risks/benefits",
+            "Using complex legal documents to frighten them into participation",
+            "Requiring participation as part of class grade without alternative",
+            "Publishing full names and transcripts without permission because it’s “for research”"
+          ],
+          "answer": "Obtaining informed consent (and parental consent if minors), ensuring privacy, and explaining voluntary participation and risks/benefits"
+        },
+        {
+          "id": "q60",
+          "type": "single",
+          "question": "Which of the following is a primary data source?",
+          "options": [
+            "Observations you collect in person for your study",
+            "National census dataset downloaded from government website",
+            "A literature review chapter from a thesis",
+            "A meta-analysis published in a journal"
+          ],
+          "answer": "Observations you collect in person for your study"
+        },
+        {
+          "id": "q61",
+          "type": "single",
+          "question": "Which method is most appropriate if a researcher wants to measure how many hours students spend on social media per week and relate that to a standardized skill score?",
+          "options": [
+            "Quantitative (surveys and standardized tests)",
+            "Qualitative (in-depth interviews only)",
+            "Purely observational field notes with no numbers",
+            "Archival literary analysis only"
+          ],
+          "answer": "Quantitative (surveys and standardized tests)"
+        },
+        {
+          "id": "q62",
+          "type": "single",
+          "question": "Why is a research proposal written before conducting the full study?",
+          "options": [
+            "To provide a clear plan of goals, methods, timeline and resources",
+            "To guarantee the research will be published",
+            "To avoid doing a literature review",
+            "To replace the final report"
+          ],
+          "answer": "To provide a clear plan of goals, methods, timeline and resources"
+        },
+        {
+          "id": "q63",
+          "type": "single",
+          "question": "A sample of 25 students has a sample mean score of 70 and a sample standard deviation of 10. Using a t-critical value of 2.064 for 95% confidence (df = 24), what is the 95% confidence interval for the population mean?",
+          "options": [
+            "(65.87, 74.13)",
+            "(66.5, 73.5)",
+            "(69.0, 71.0)",
+            "(60.0, 80.0)"
+          ],
+          "answer": "(65.87, 74.13)"
+        },
+        {
+          "id": "q64",
+          "type": "single",
+          "question": "Which section of the proposal most often includes a Gantt chart or schedule for tasks and milestones?",
+          "options": [
+            "Timeline (or Project Timeline)",
+            "Introduction",
+            "References",
+            "Methodology"
+          ],
+          "answer": "Timeline (or Project Timeline)"
+        },
+        {
+          "id": "q65",
+          "type": "single",
+          "question": "For two independent groups with non-normal distributions, which test is most suitable to compare central tendency?",
+          "options": [
+            "Mann–Whitney U test",
+            "Independent samples t-test",
+            "ANOVA",
+            "Paired samples t-test"
+          ],
+          "answer": "Mann–Whitney U test"
+        },
+        {
+          "id": "q66",
+          "type": "single",
+          "question": "Which statement about parametric vs nonparametric tests is correct?",
+          "options": [
+            "Parametric tests generally have more statistical power if assumptions hold.",
+            "Parametric tests never require normality.",
+            "Nonparametric tests always provide effect size measures directly.",
+            "Nonparametric tests assume data are normally distributed."
+          ],
+          "answer": "Parametric tests generally have more statistical power if assumptions hold."
+        },
+        {
+          "id": "q67",
+          "type": "single",
+          "question": "Given sample test scores: 62, 70, 68, 75, 65. What is the mean score?",
+          "options": [
+            "68.0",
+            "69.0",
+            "66.8",
+            "67.6"
+          ],
+          "answer": "68.0"
+        },
+        {
+          "id": "q68",
+          "type": "single",
+          "question": "A researcher plans to compare mean test scores between two independent groups. Which statistical test is usually appropriate (assuming normality and equal variances)?",
+          "options": [
+            "Independent samples t-test",
+            "Chi-square test",
+            "Pearson correlation",
+            "One-way ANOVA for three groups only"
+          ],
+          "answer": "Independent samples t-test"
+        },
+        {
+          "id": "q69",
+          "type": "single",
+          "question": "Which statistical test is most appropriate to compare mean lettuce yields between two independent groups (full-spectrum vs red-blue), when sample sizes are small and data are approximately normally distributed?",
+          "options": [
+            "Independent (two-sample) t-test",
+            "Paired t-test",
+            "Pearson correlation",
+            "Chi-square test"
+          ],
+          "answer": "Independent (two-sample) t-test"
+        },
+        {
+          "id": "q70",
+          "type": "single",
+          "question": "Interpretation of a p-value of 0.03 (with α = 0.05):",
+          "options": [
+            "There is strong evidence against the null, so reject the null at α = 0.05.",
+            "The null hypothesis is definitely true.",
+            "The effect is practically important.",
+            "There is a 3% probability the alternative hypothesis is true."
+          ],
+          "answer": "There is strong evidence against the null, so reject the null at α = 0.05."
+        }
+      ]
+    },
+    {
+      "id": "V3",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single",
+          "question": "In inferential statistics, what does a p-value < 0.05 typically mean?",
+          "options": [
+            "The alternative hypothesis is false.",
+            "The result is always practically important.",
+            "The observed effect is unlikely under the null; reject null at 5% significance.",
+            "The null hypothesis is proven true."
+          ],
+          "answer": "The observed effect is unlikely under the null; reject null at 5% significance."
+        },
+        {
+          "id": "q2",
+          "type": "single",
+          "question": "A researcher recruits only members of a single school club to study “social media and international competition participation.” This sampling method is likely to produce:",
+          "options": [
+            "The best possible generalization to all teenagers worldwide",
+            "Sampling bias (low external validity)",
+            "A randomized controlled trial",
+            "A perfectly representative sample"
+          ],
+          "answer": "Sampling bias (low external validity)"
+        },
+        {
+          "id": "q3",
+          "type": "single",
+          "question": "Consider the final research question you provided: “How does the use of social media contribute to skill development and encourage participation in international online competitions among high school students?” Which of these correctly identifies the independent and dependent variables if you were to form a hypothesis?",
+          "options": [
+            "Independent = social media use; Dependent = skill development and competition participation",
+            "Independent = skill development; Dependent = social media use",
+            "Independent = number of international competitions; Dependent = student grade level",
+            "Independent = participation in competitions; Dependent = social media use"
+          ],
+          "answer": "Independent = social media use; Dependent = skill development and competition participation"
+        },
+        {
+          "id": "q4",
+          "type": "single",
+          "question": "Which of these is an example of ordinal categorical data?",
+          "options": [
+            "Temperature in Celsius",
+            "Eye color (blue, brown, green) with no order",
+            "Letter grades (A, B, C, D, F)",
+            "Student ID numbers"
+          ],
+          "answer": "Letter grades (A, B, C, D, F)"
+        },
+        {
+          "id": "q5",
+          "type": "single",
+          "question": "You measure study hours and GPA for 30 students and want to test whether study hours predict GPA. Steps in proper order:",
+          "options": [
+            "Choose a test at random → run it → report p-value",
+            "Only compute means and stop",
+            "Check distribution/normality → choose appropriate parametric/nonparametric test or regression → run test → interpret p-value & effect size",
+            "Run t-test → choose test based on p-value → check normality"
+          ],
+          "answer": "Check distribution/normality → choose appropriate parametric/nonparametric test or regression → run test → interpret p-value & effect size"
+        },
+        {
+          "id": "q6",
+          "type": "single",
+          "question": "Which of these ethics considerations is essential when collecting primary data from human participants?",
+          "options": [
+            "Publishing participants’ names with test scores for transparency",
+            "Obtaining informed consent and ensuring confidentiality",
+            "Avoiding any form of documentation of consent",
+            "Only using participants who will guarantee the hypothesis"
+          ],
+          "answer": "Obtaining informed consent and ensuring confidentiality"
+        },
+        {
+          "id": "q7",
+          "type": "single",
+          "question": "A student proposes to study whether indoor LED light spectrum affects growth of houseplants. They plan two light treatments and measure height after 8 weeks. Which design is this?",
+          "options": [
+            "Ethnographic fieldwork",
+            "Secondary data analysis",
+            "Experimental design with control of independent variable",
+            "Cross-sectional survey"
+          ],
+          "answer": "Experimental design with control of independent variable"
+        },
+        {
+          "id": "q8",
+          "type": "single",
+          "question": "A study aims to explore how participants describe their experience of community gardening. Which method is most appropriate?",
+          "options": [
+            "In-depth qualitative interviews",
+            "Randomized controlled trial",
+            "Secondary analysis of economic data",
+            "Structured questionnaire with numeric scales"
+          ],
+          "answer": "In-depth qualitative interviews"
+        },
+        {
+          "id": "q9",
+          "type": "single",
+          "question": "Which probability distribution description is correct?",
+          "options": [
+            "Normal distribution: symmetric, bell-shaped around the mean",
+            "Normal distribution: strongly skewed to the right",
+            "Non-normal distribution: always has zero variance",
+            "Non-normal distribution: always symmetric around mean"
+          ],
+          "answer": "Normal distribution: symmetric, bell-shaped around the mean"
+        },
+        {
+          "id": "q10",
+          "type": "single",
+          "question": "Given data [10,12,14,16,18] (mean = 14), the variance computed as Σ(X−mean)² ÷ (n−1) equals 10. What is the standard deviation?",
+          "options": [
+            "10.00",
+            "5.00",
+            "3.16",
+            "1.00"
+          ],
+          "answer": "3.16"
+        },
+        {
+          "id": "q11",
+          "type": "single",
+          "question": "Which of these best describes secondary data?",
+          "options": [
+            "Raw interview transcripts you personally record",
+            "Pre-existing data collected by someone else, e.g., government reports",
+            "Data you design and collect yourself via experiment",
+            "Data that are always less reliable than primary data"
+          ],
+          "answer": "Pre-existing data collected by someone else, e.g., government reports"
+        },
+        {
+          "id": "q12",
+          "type": "single",
+          "question": "You have Likert-item responses (Strongly disagree–Strongly agree). What is the safest assumption about the scale when choosing analyses?",
+          "options": [
+            "Always treat it as ratio for parametric tests",
+            "Treat it as ordinal — medians and nonparametric tests are appropriate",
+            "Treat it as nominal and use chi-square only",
+            "Convert to z-scores and do structural equation modelling"
+          ],
+          "answer": "Treat it as ordinal — medians and nonparametric tests are appropriate"
+        },
+        {
+          "id": "q13",
+          "type": "single",
+          "question": "Which visualization is most appropriate for showing proportions of categorical study environments (Library, Home, Café) from a sample?",
+          "options": [
+            "Box plot",
+            "Pie chart or bar chart",
+            "Scatter plot",
+            "3D model"
+          ],
+          "answer": "Pie chart or bar chart"
+        },
+        {
+          "id": "q14",
+          "type": "single",
+          "question": "Which measurement scale best describes this variable: “Number of international online competitions a student entered in the past year”?",
+          "options": [
+            "Interval",
+            "Ratio",
+            "Ordinal",
+            "Nominal"
+          ],
+          "answer": "Ratio"
+        },
+        {
+          "id": "q15",
+          "type": "single",
+          "question": "Which of the following visualizations is least appropriate for high-cardinality categorical variables (many categories)?",
+          "options": [
+            "Frequency table with sorted categories",
+            "Pie chart with 20+ slices",
+            "Bar graph (vertical bars)",
+            "Horizontal ordered bar chart"
+          ],
+          "answer": "Pie chart with 20+ slices"
+        },
+        {
+          "id": "q16",
+          "type": "single",
+          "question": "If a hypothesis test returns a p-value = 0.03 (alpha = 0.05), the correct statistical interpretation is:",
+          "options": [
+            "The null hypothesis is definitely true.",
+            "The observed data are incompatible with the null hypothesis at the 5% significance level, so reject the null.",
+            "There is a 3% chance the alternative hypothesis is true.",
+            "The results are not statistically significant."
+          ],
+          "answer": "The observed data are incompatible with the null hypothesis at the 5% significance level, so reject the null."
+        },
+        {
+          "id": "q17",
+          "type": "single",
+          "question": "Compute the mean and median of the following test scores for five students: 70, 75, 80, 85, 90.",
+          "options": [
+            "Mean = 80; Median = 75",
+            "Mean = 400; Median = 80",
+            "Mean = 80; Median = 80",
+            "Mean = 70; Median = 85"
+          ],
+          "answer": "Mean = 80; Median = 80"
+        },
+        {
+          "id": "q18",
+          "type": "single",
+          "question": "What is a Zero Research Question as used in early-stage research planning?",
+          "options": [
+            "A question that has already been answered by previous studies",
+            "A starting, broad question to help focus and generate more specific research questions",
+            "A question that must score zero on the importance scale",
+            "A question only used in quantitative studies"
+          ],
+          "answer": "A starting, broad question to help focus and generate more specific research questions"
+        },
+        {
+          "id": "q19",
+          "type": "single",
+          "question": "Which of the following is a clear, testable null hypothesis for a two-group comparison of exam scores between group A and group B?",
+          "options": [
+            "The exam is too hard.",
+            "There is no difference in mean exam scores between group A and group B.",
+            "Group A will do better on the exam.",
+            "Students enjoy the course."
+          ],
+          "answer": "There is no difference in mean exam scores between group A and group B."
+        },
+        {
+          "id": "q20",
+          "type": "single",
+          "question": "Which of the following is not a key characteristic of a good research question?",
+          "options": [
+            "Feasibility",
+            "Relevance",
+            "Clarity",
+            "Ambiguity"
+          ],
+          "answer": "Ambiguity"
+        },
+        {
+          "id": "q21",
+          "type": "single",
+          "question": "Which citation belongs in the References section of a proposal?",
+          "options": [
+            "The personal notes of the principal investigator (unpublished)",
+            "A peer-reviewed journal article you cited in the literature review",
+            "A list of interview questions used in the pilot study (not published)",
+            "The full raw dataset you will collect (not yet collected)"
+          ],
+          "answer": "A peer-reviewed journal article you cited in the literature review"
+        },
+        {
+          "id": "q22",
+          "type": "single",
+          "question": "A student paraphrases two sentences from Wu et al. [1] but does not add a citation because they \"used their own words.\" According to good research practice, the correct action is:",
+          "options": [
+            "Add the full paragraph verbatim without citation.",
+            "Add a citation to Wu et al. [1] and ensure paraphrase is genuinely different wording.",
+            "No citation needed — paraphrase means no attribution.",
+            "Remove the paraphrase entirely; only direct quotes may be cited."
+          ],
+          "answer": "Add a citation to Wu et al. [1] and ensure paraphrase is genuinely different wording."
+        },
+        {
+          "id": "q23",
+          "type": "single",
+          "question": "Which variable type is represented by “highest educational degree” with categories {High school, Bachelor, Master, PhD}?",
+          "options": [
+            "Interval",
+            "Nominal",
+            "Ordinal",
+            "Ratio"
+          ],
+          "answer": "Ordinal"
+        },
+        {
+          "id": "q24",
+          "type": "single",
+          "question": "Which element belongs in a research proposal rather than the experimental phase?",
+          "options": [
+            "Final dataset for analysis",
+            "Hypotheses and research questions",
+            "Raw data collection plan",
+            "Detailed laboratory procedures for experiments"
+          ],
+          "answer": "Hypotheses and research questions"
+        },
+        {
+          "id": "q25",
+          "type": "single",
+          "question": "You compare the same students’ GPAs before and after an intervention (paired data). Which test is appropriate if the difference scores are normally distributed?",
+          "options": [
+            "Mann–Whitney U test",
+            "Paired samples t-test",
+            "Independent samples t-test",
+            "Chi-square test"
+          ],
+          "answer": "Paired samples t-test"
+        },
+        {
+          "id": "q26",
+          "type": "single",
+          "question": "The primary purpose of a literature review is to:",
+          "options": [
+            "Provide a popular-science summary for friends",
+            "Investigate specific literature to understand what’s known and identify gaps or opportunities for your research",
+            "Summarize every article ever written on a topic",
+            "Replace data collection with reading"
+          ],
+          "answer": "Investigate specific literature to understand what’s known and identify gaps or opportunities for your research"
+        },
+        {
+          "id": "q27",
+          "type": "single",
+          "question": "Which sentence best distinguishes a research proposal from a research paper?",
+          "options": [
+            "A proposal includes discussion and conclusion; a paper never includes methodology.",
+            "A proposal persuades supervisors that the study should be done; a research paper presents completed results and contributes new knowledge.",
+            "A proposal is the final report of findings; a paper is a plan to do the study.",
+            "There is no difference—both are identical."
+          ],
+          "answer": "A proposal persuades supervisors that the study should be done; a research paper presents completed results and contributes new knowledge."
+        },
+        {
+          "id": "q28",
+          "type": "single",
+          "question": "When preparing references for a research proposal using IEEE style, which of the following is TRUE about DOIs and the reference list?",
+          "options": [
+            "Never include DOIs in IEEE references — use URLs only.",
+            "Include the DOI if available; format it as lowercase doi: followed by the identifier.",
+            "DOIs are optional and should always be in uppercase DOI:.",
+            "Place the DOI inside square brackets at the start of the reference."
+          ],
+          "answer": "Include the DOI if available; format it as lowercase doi: followed by the identifier."
+        },
+        {
+          "id": "q29",
+          "type": "single",
+          "question": "Which statement correctly contrasts reliability and validity?",
+          "options": [
+            "If a measure is valid, it cannot be unreliable.",
+            "Reliability refers to consistency of a measure; validity refers to whether the instrument measures what it intends to measure.",
+            "Reliability is about accuracy; validity is about consistency.",
+            "Validity can be ignored if a test is reliable."
+          ],
+          "answer": "Reliability refers to consistency of a measure; validity refers to whether the instrument measures what it intends to measure."
+        },
+        {
+          "id": "q30",
+          "type": "single",
+          "question": "A study reports a 95% confidence interval for the difference in mean yield between two LED spectra as [−0.5 g, 2.3 g]. What is the correct conclusion?",
+          "options": [
+            "The true mean difference is exactly 0.9 g.",
+            "The null value (zero difference) lies inside the interval, so the difference is not statistically significant at 95% CI.",
+            "The difference is statistically significant (p < 0.05).",
+            "The result proves the white LED increases yield."
+          ],
+          "answer": "The null value (zero difference) lies inside the interval, so the difference is not statistically significant at 95% CI."
+        },
+        {
+          "id": "q31",
+          "type": "single",
+          "question": "Which procedure would you use if sample size > 50 to test for normality (according to typical guidance)?",
+          "options": [
+            "Wilcoxon signed-rank test",
+            "Kolmogorov–Smirnov or other large-sample tests",
+            "Shapiro–Wilk only",
+            "Mann–Whitney U test"
+          ],
+          "answer": "Kolmogorov–Smirnov or other large-sample tests"
+        },
+        {
+          "id": "q32",
+          "type": "single",
+          "question": "Five plants grown under full-spectrum light produced yields (g): 10, 12, 9, 11, 13. What is the sample mean yield?",
+          "options": [
+            "12 g",
+            "11 g",
+            "10 g",
+            "55 g"
+          ],
+          "answer": "11 g"
+        },
+        {
+          "id": "q33",
+          "type": "single",
+          "question": "Which experimental practice reduces selection bias and helps ensure groups are comparable at baseline?",
+          "options": [
+            "Not reporting dropouts.",
+            "Randomization of subjects to treatment groups.",
+            "Publishing only significant results.",
+            "Assigning treatments based on participant preference."
+          ],
+          "answer": "Randomization of subjects to treatment groups."
+        },
+        {
+          "id": "q34",
+          "type": "single",
+          "question": "Which statement about mean and median is true when a dataset has a large positive outlier?",
+          "options": [
+            "Mean < Median (mean is pulled left).",
+            "Mean > Median (mean is pulled right).",
+            "Mean and median always remain equal.",
+            "Median becomes undefined."
+          ],
+          "answer": "Mean > Median (mean is pulled right)."
+        },
+        {
+          "id": "q35",
+          "type": "single",
+          "question": "Which visualization is best for showing the relationship between two continuous variables?",
+          "options": [
+            "Pie chart",
+            "Scatter plot",
+            "Bar graph",
+            "Flowchart"
+          ],
+          "answer": "Scatter plot"
+        },
+        {
+          "id": "q36",
+          "type": "single",
+          "question": "Which of the following correctly pairs Type I and Type II errors?",
+          "options": [
+            "Type I = correct decision; Type II = inconclusive result",
+            "Type I = false positive; Type II = false negative",
+            "Type I = false negative; Type II = false positive",
+            "Type I and II are the same"
+          ],
+          "answer": "Type I = false positive; Type II = false negative"
+        },
+        {
+          "id": "q37",
+          "type": "single",
+          "question": "Which of the following is the correctly formatted IEEE reference for the Alrajhi et al. paper :",
+          "options": [
+            "Alrajhi A A; Impact of LED spectrum on growth and photosynthesis in lettuce; Plants; 2023.",
+            "A. A. Alrajhi et al., \"Impact of LED spectrum on growth and photosynthesis in lettuce,\" Plants, vol. 12, no. 3, art. 463, 2023. doi: 10.3390/plants12030463.",
+            "A. A. Alrajhi, \"Impact of LED spectrum on growth and photosynthesis in lettuce,\" Plants, vol. 12, no. 3, art. 463, 2023. DOI: 10.3390/plants12030463.",
+            "Alrajhi, A.A., (2023). Impact of LED spectrum on growth and photosynthesis in lettuce. Plants, 12(3):463. https://doi.org/10.3390/plants12030463"
+          ],
+          "answer": "A. A. Alrajhi et al., \"Impact of LED spectrum on growth and photosynthesis in lettuce,\" Plants, vol. 12, no. 3, art. 463, 2023. doi: 10.3390/plants12030463."
+        },
+        {
+          "id": "q38",
+          "type": "single",
+          "question": "Given the dataset [10, 12, 12, 14, 15, 16, 18], what is the mode?",
+          "options": [
+            "15",
+            "12",
+            "14",
+            "13.86"
+          ],
+          "answer": "12"
+        },
+        {
+          "id": "q39",
+          "type": "single",
+          "question": "A researcher finds mean difference d̄ = 0.4, sd(diff) = 0.25, n = 10 for a paired test. The t-statistic computed as t = d̄ / (sd/√n) ≈ 5.06. What does a t ≈ 5.06 typically indicate (two-tailed)?",
+          "options": [
+            "The test is invalid",
+            "Strong evidence that difference ≠ 0 (statistically significant)",
+            "No evidence of change",
+            "The p-value must be > 0.05"
+          ],
+          "answer": "Strong evidence that difference ≠ 0 (statistically significant)"
+        },
+        {
+          "id": "q40",
+          "type": "single",
+          "question": "A researcher obtains p = 0.12 when comparing two groups. Which is a correct conclusion at α = 0.05, and what might they consider next?",
+          "options": [
+            "Declare the alternative true because p < 0.5.",
+            "Fail to reject the null; consider increasing sample size or checking assumptions.",
+            "Reject the null — the result is significant; no further action needed.",
+            "Change α to 0.2 to report significance."
+          ],
+          "answer": "Fail to reject the null; consider increasing sample size or checking assumptions."
+        },
+        {
+          "id": "q41",
+          "type": "single",
+          "question": "Which statement about reliability and validity is correct?",
+          "options": [
+            "Validity only matters in qualitative research.",
+            "A test must be reliable before it can be valid.",
+            "A measure can be valid without being reliable.",
+            "Reliability is about accuracy; validity is about consistency."
+          ],
+          "answer": "A test must be reliable before it can be valid."
+        },
+        {
+          "id": "q42",
+          "type": "single",
+          "question": "What is the primary purpose of a research question?",
+          "options": [
+            "To summarize the research findings.",
+            "To serve as the foundation that guides the entire research study.",
+            "To provide a detailed literature review.",
+            "To list the research tools and software."
+          ],
+          "answer": "To serve as the foundation that guides the entire research study."
+        },
+        {
+          "id": "q43",
+          "type": "single",
+          "question": "Which data type should be used with a pie chart?",
+          "options": [
+            "Two continuous variables relationship (e.g., study hours vs GPA)",
+            "Categorical proportions (e.g., study environment percentages)",
+            "Continuous numeric measurements (e.g., height)",
+            "Time-to-event survival data"
+          ],
+          "answer": "Categorical proportions (e.g., study environment percentages)"
+        },
+        {
+          "id": "q44",
+          "type": "single",
+          "question": "Which statement correctly contrasts qualitative and quantitative research?",
+          "options": [
+            "They are identical in data collection and analysis.",
+            "Qualitative research is exploratory and context-rich; quantitative focuses on measurement and statistical testing.",
+            "Qualitative research measures quantities; quantitative explores meanings.",
+            "Quantitative research uses words; qualitative uses numbers."
+          ],
+          "answer": "Qualitative research is exploratory and context-rich; quantitative focuses on measurement and statistical testing."
+        },
+        {
+          "id": "q45",
+          "type": "single",
+          "question": "Which sequence shows the most correct order of early steps in a typical research process?",
+          "options": [
+            "Write research report → Conduct literature review → Collect data → Submit",
+            "Identify a research topic → Conduct a preliminary literature review → Formulate research question/hypothesis → Select methodology → Design plan",
+            "Collect data → Formulate research question → Analyze data → Write report",
+            "Present → Collect data → Interpret results → Design research plan"
+          ],
+          "answer": "Identify a research topic → Conduct a preliminary literature review → Formulate research question/hypothesis → Select methodology → Design plan"
+        },
+        {
+          "id": "q46",
+          "type": "single",
+          "question": "Which statement best describes reliability vs validity?",
+          "options": [
+            "Reliability and validity mean the same thing",
+            "Reliability = producing consistent results across repeated measures; Validity = actually measuring the concept you want to measure",
+            "Reliability = measuring what you intend to measure; Validity = producing consistent results",
+            "Reliability refers to statistical significance; validity refers to practical significance"
+          ],
+          "answer": "Reliability = producing consistent results across repeated measures; Validity = actually measuring the concept you want to measure"
+        },
+        {
+          "id": "q47",
+          "type": "single",
+          "question": "Which of the following is a measure of dispersion?",
+          "options": [
+            "Proportion",
+            "Standard deviation",
+            "Mode",
+            "Mean"
+          ],
+          "answer": "Standard deviation"
+        },
+        {
+          "id": "q48",
+          "type": "single",
+          "question": "Which of the following best defines research?",
+          "options": [
+            "Copying existing reports and combining them into one document",
+            "A systematic process of investigating and analyzing information to answer questions, solve problems, or generate new knowledge",
+            "A random collection of facts for a school project",
+            "Giving presentations about what other people discovered"
+          ],
+          "answer": "A systematic process of investigating and analyzing information to answer questions, solve problems, or generate new knowledge"
+        },
+        {
+          "id": "q49",
+          "type": "single",
+          "question": "A researcher wants to compare the average number of competitions entered by students who actively use social media for skill-building versus those who do not. Which statistical test is most appropriate (assuming normality and equal variances)?",
+          "options": [
+            "One-way ANOVA with three unrelated groups",
+            "Independent-samples t-test",
+            "Chi-square test",
+            "Pearson correlation coefficient"
+          ],
+          "answer": "Independent-samples t-test"
+        },
+        {
+          "id": "q50",
+          "type": "single",
+          "question": "Which component of a proposal explains why the chosen methods are appropriate and how data will be analyzed?",
+          "options": [
+            "Acknowledgments",
+            "Methodology section",
+            "Title page",
+            "References"
+          ],
+          "answer": "Methodology section"
+        },
+        {
+          "id": "q51",
+          "type": "single",
+          "question": "An observational study finds a positive correlation between time spent watching YouTube tutorials and coding skill scores. Which statement is correct?",
+          "options": [
+            "The correlation proves that tutorials are always accurate.",
+            "Correlation does not imply causation; further experimental or longitudinal study is needed to infer causality.",
+            "You can conclude YouTube watching causes improved coding skills.",
+            "You can conclude coding skills cause people to watch YouTube."
+          ],
+          "answer": "Correlation does not imply causation; further experimental or longitudinal study is needed to infer causality."
+        },
+        {
+          "id": "q52",
+          "type": "single",
+          "question": "A researcher studies lettuce yield under two LED spectra: full-spectrum white and red-blue mix. Which of the following correctly identifies the independent and dependent variables?",
+          "options": [
+            "IV = growth medium; DV = LED spectrum.",
+            "IV = LED spectrum; DV = lettuce yield.",
+            "IV = lettuce yield; DV = LED spectrum.",
+            "IV = sample size; DV = LED spectrum."
+          ],
+          "answer": "IV = LED spectrum; DV = lettuce yield."
+        },
+        {
+          "id": "q53",
+          "type": "single",
+          "question": "If a study reports a p-value of 0.03 for the effect of social media on participation, which is the correct interpretation?",
+          "options": [
+            "The alternative hypothesis is definitely true.",
+            "There is a 3% probability of obtaining the observed data (or more extreme) if the null hypothesis is true.",
+            "There is a 3% chance the null hypothesis is true.",
+            "The results are practically important."
+          ],
+          "answer": "There is a 3% probability of obtaining the observed data (or more extreme) if the null hypothesis is true."
+        },
+        {
+          "id": "q54",
+          "type": "single",
+          "question": "Which section of a research proposal should briefly summarize key aims, methods, and expected outcomes?",
+          "options": [
+            "References",
+            "Abstract",
+            "Title",
+            "Literature review"
+          ],
+          "answer": "Abstract"
+        },
+        {
+          "id": "q55",
+          "type": "single",
+          "question": "A survey uses a Likert scale (Strongly disagree → Strongly agree). What level of measurement is this typically considered?",
+          "options": [
+            "Interval with equal units guaranteed",
+            "Ordinal",
+            "Nominal",
+            "Ratio with a true zero"
+          ],
+          "answer": "Ordinal"
+        },
+        {
+          "id": "q56",
+          "type": "single",
+          "question": "Which of the following is not a primary purpose of a literature review?",
+          "options": [
+            "Contextualizing the research problem",
+            "Replicating the exact text of prior studies verbatim",
+            "Identifying gaps in existing research",
+            "Understanding methodologies used by others"
+          ],
+          "answer": "Replicating the exact text of prior studies verbatim"
+        },
+        {
+          "id": "q57",
+          "type": "single",
+          "question": "In the Jemmy social-media scenario: “How are high school students using social media and does it influence their participation in international activities?” — identify the most likely independent and dependent variables.",
+          "options": [
+            "Independent: Students’ school subject; Dependent: Country of residence",
+            "Independent: Use of social media platforms (YouTube, Discord, etc.); Dependent: Development of skills / participation in international competitions",
+            "Independent: Participation in international activities; Dependent: Use of social media",
+            "Independent: Time of day; Dependent: Platform logo color"
+          ],
+          "answer": "Independent: Use of social media platforms (YouTube, Discord, etc.); Dependent: Development of skills / participation in international competitions"
+        },
+        {
+          "id": "q58",
+          "type": "single",
+          "question": "Which test is most appropriate to check normality for a dataset of 30 observations?",
+          "options": [
+            "Chi-square test",
+            "Shapiro–Wilk test",
+            "Kolmogorov–Smirnov test",
+            "Wilcoxon signed-rank test"
+          ],
+          "answer": "Shapiro–Wilk test"
+        },
+        {
+          "id": "q59",
+          "type": "single",
+          "question": "Which of these is most essential from an ethics perspective when conducting interviews with high school students about online competition participation?",
+          "options": [
+            "Requiring participation as part of class grade without alternative",
+            "Obtaining informed consent (and parental consent if minors), ensuring privacy, and explaining voluntary participation and risks/benefits",
+            "Using complex legal documents to frighten them into participation",
+            "Publishing full names and transcripts without permission because it’s “for research”"
+          ],
+          "answer": "Obtaining informed consent (and parental consent if minors), ensuring privacy, and explaining voluntary participation and risks/benefits"
+        },
+        {
+          "id": "q60",
+          "type": "single",
+          "question": "Which of the following is a primary data source?",
+          "options": [
+            "A meta-analysis published in a journal",
+            "Observations you collect in person for your study",
+            "National census dataset downloaded from government website",
+            "A literature review chapter from a thesis"
+          ],
+          "answer": "Observations you collect in person for your study"
+        },
+        {
+          "id": "q61",
+          "type": "single",
+          "question": "Which method is most appropriate if a researcher wants to measure how many hours students spend on social media per week and relate that to a standardized skill score?",
+          "options": [
+            "Archival literary analysis only",
+            "Quantitative (surveys and standardized tests)",
+            "Qualitative (in-depth interviews only)",
+            "Purely observational field notes with no numbers"
+          ],
+          "answer": "Quantitative (surveys and standardized tests)"
+        },
+        {
+          "id": "q62",
+          "type": "single",
+          "question": "Why is a research proposal written before conducting the full study?",
+          "options": [
+            "To replace the final report",
+            "To provide a clear plan of goals, methods, timeline and resources",
+            "To guarantee the research will be published",
+            "To avoid doing a literature review"
+          ],
+          "answer": "To provide a clear plan of goals, methods, timeline and resources"
+        },
+        {
+          "id": "q63",
+          "type": "single",
+          "question": "A sample of 25 students has a sample mean score of 70 and a sample standard deviation of 10. Using a t-critical value of 2.064 for 95% confidence (df = 24), what is the 95% confidence interval for the population mean?",
+          "options": [
+            "(60.0, 80.0)",
+            "(65.87, 74.13)",
+            "(66.5, 73.5)",
+            "(69.0, 71.0)"
+          ],
+          "answer": "(65.87, 74.13)"
+        },
+        {
+          "id": "q64",
+          "type": "single",
+          "question": "Which section of the proposal most often includes a Gantt chart or schedule for tasks and milestones?",
+          "options": [
+            "Methodology",
+            "Timeline (or Project Timeline)",
+            "Introduction",
+            "References"
+          ],
+          "answer": "Timeline (or Project Timeline)"
+        },
+        {
+          "id": "q65",
+          "type": "single",
+          "question": "For two independent groups with non-normal distributions, which test is most suitable to compare central tendency?",
+          "options": [
+            "ANOVA",
+            "Mann–Whitney U test",
+            "Independent samples t-test",
+            "Paired samples t-test"
+          ],
+          "answer": "Mann–Whitney U test"
+        },
+        {
+          "id": "q66",
+          "type": "single",
+          "question": "Which statement about parametric vs nonparametric tests is correct?",
+          "options": [
+            "Nonparametric tests assume data are normally distributed.",
+            "Parametric tests generally have more statistical power if assumptions hold.",
+            "Parametric tests never require normality.",
+            "Nonparametric tests always provide effect size measures directly."
+          ],
+          "answer": "Parametric tests generally have more statistical power if assumptions hold."
+        },
+        {
+          "id": "q67",
+          "type": "single",
+          "question": "Given sample test scores: 62, 70, 68, 75, 65. What is the mean score?",
+          "options": [
+            "67.6",
+            "68.0",
+            "69.0",
+            "66.8"
+          ],
+          "answer": "68.0"
+        },
+        {
+          "id": "q68",
+          "type": "single",
+          "question": "A researcher plans to compare mean test scores between two independent groups. Which statistical test is usually appropriate (assuming normality and equal variances)?",
+          "options": [
+            "One-way ANOVA for three groups only",
+            "Independent samples t-test",
+            "Chi-square test",
+            "Pearson correlation"
+          ],
+          "answer": "Independent samples t-test"
+        },
+        {
+          "id": "q69",
+          "type": "single",
+          "question": "Which statistical test is most appropriate to compare mean lettuce yields between two independent groups (full-spectrum vs red-blue), when sample sizes are small and data are approximately normally distributed?",
+          "options": [
+            "Chi-square test",
+            "Independent (two-sample) t-test",
+            "Paired t-test",
+            "Pearson correlation"
+          ],
+          "answer": "Independent (two-sample) t-test"
+        },
+        {
+          "id": "q70",
+          "type": "single",
+          "question": "Interpretation of a p-value of 0.03 (with α = 0.05):",
+          "options": [
+            "The effect is practically important.",
+            "There is strong evidence against the null, so reject the null at α = 0.05.",
+            "The null hypothesis is definitely true.",
+            "There is a 3% probability the alternative hypothesis is true."
+          ],
+          "answer": "There is strong evidence against the null, so reject the null at α = 0.05."
+        }
+      ]
+    }
+  ]
+}
