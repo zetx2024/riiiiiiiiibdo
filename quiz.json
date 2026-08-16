@@ -1,9 +1,1 @@
-{
-  "title":"Academic Excellence Quiz",
-  "timeLimitMinutes":20,
-  "questions":[
-    {"id":"q1","type":"single","text":"Which planet is known as the Red Planet?","options":["Earth","Mars","Jupiter","Venus"]},
-    {"id":"q2","type":"multi","text":"Which are programming languages?","options":["Python","HTML","Java","CSS"]},
-    {"id":"q3","type":"text","text":"What is the capital of Bangladesh?"}
-  ]
-}
+{"time_limit_minutes":15,"variants":[{"id":"V1","questions":[{"id":"q1","type":"single","question":"Which is a web browser?","options":["PHP","Chrome","MySQL","JSON"]},{"id":"q2","type":"multi","question":"Which are programming languages?","options":["PHP","Python","HTML","Java"]},{"id":"q3","type":"text","question":"What does CSS stand for?"}]},{"id":"V2","questions":[{"id":"q1","type":"single","question":"Which is a database system?","options":["MySQL","CSS","Chrome","JSON"]},{"id":"q2","type":"multi","question":"Which are programming languages?","options":["Java","Python","HTML","PHP"]},{"id":"q3","type":"text","question":"What does HTML stand for?"}]},{"id":"V3","questions":[{"id":"q1","type":"single","question":"Which technology is used for page styling?","options":["CSS","PHP","MySQL","SMTP"]},{"id":"q2","type":"multi","question":"Which are web technologies/languages?","options":["JavaScript","PHP","CSS","SMTP"]},{"id":"q3","type":"text","question":"What does PHP stand for?"}]}]}
