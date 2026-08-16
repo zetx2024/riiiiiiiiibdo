@@ -1,0 +1,18 @@
+[
+  {
+    "email": "1@1.c1",
+    "password": "pass",
+    "name": "Demo 1 Student",
+    "institution": "Demo 1 Institution",
+    "country": "Bangladesh",
+    "category": "General"
+  },
+  {
+    "email": "2@1.c1",
+    "password": "pass",
+    "name": "Demo 2 Student",
+    "institution": "Demo 2 Institution",
+    "country": "Bangladesh",
+    "category": "General"
+  }
+]
