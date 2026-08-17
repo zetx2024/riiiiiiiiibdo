@@ -30,6 +30,28 @@ function setPage(html,cls=""){
   document.body.innerHTML=html;
 }
 
+async function environmentCheck(showOnlyIfNeeded=true){
+  const ua=navigator.userAgent||'';
+  const checks=[];
+  const isModern=/Chrome\/\d+|Edg\/\d+|Firefox\/\d+|Safari\/\d+/.test(ua) && !/MSIE|Trident\//.test(ua);
+  if(!isModern) checks.push({title:'Use a supported modern browser',detail:'Please use the latest Google Chrome, Microsoft Edge, Mozilla Firefox, or Safari.'});
+  if(!window.fetch) checks.push({title:'Enable JavaScript / update your browser',detail:'The assessment requires Fetch API support.'});
+  if(!window.localStorage) checks.push({title:'Enable site storage',detail:'Allow local storage/cookies for this assessment website.'});
+  if(!window.crypto?.randomUUID) checks.push({title:'Update your browser',detail:'Secure session identification requires crypto.randomUUID().'});
+  if(!document.fullscreenEnabled || !document.documentElement.requestFullscreen) checks.push({title:'Allow fullscreen mode',detail:'Use a desktop browser that supports fullscreen and allow fullscreen when the assessment starts.'});
+  if(!window.Promise) checks.push({title:'Update your browser',detail:'Modern JavaScript Promise support is required.'});
+  if(!showOnlyIfNeeded || checks.length){
+    const old=document.querySelector('#environmentModal'); old?.remove();
+    if(checks.length){
+      const el=document.createElement('div');el.id='environmentModal';el.className='modal-backdrop';
+      el.innerHTML=`<div class="modal-card environment-card" role="alertdialog" aria-modal="true"><div class="modal-top"><div class="modal-icon danger-icon">!</div><div><div class="eyebrow danger-text">BROWSER CHECK</div><h2>One setup step is required</h2></div></div><p class="muted">Your browser is close to ready, but the assessment cannot safely start until the following is fixed:</p><div class="environment-list">${checks.map(x=>`<div class="environment-item"><strong>${esc(x.title)}</strong><span>${esc(x.detail)}</span></div>`).join('')}</div><div class="modal-actions"><button id="recheckEnv" class="btn gold full">Check again</button></div></div>`;
+      document.body.appendChild(el);el.querySelector('#recheckEnv').onclick=async()=>{el.remove();await environmentCheck(true);if(!document.querySelector('#environmentModal'))login()};
+      return false;
+    }
+  }
+  return true;
+}
+
 function login(){
   setPage(`<main class="auth-shell"><section class="auth-card">
     <div class="brand-mark">I</div><div class="eyebrow">SECURE ASSESSMENT PORTAL</div>
@@ -119,6 +141,7 @@ function instructions(){
 
 async function start(){
   try{
+    if(!(await environmentCheck(true))) return;
     try{await document.documentElement.requestFullscreen?.();}catch(_){}
     const variants=quiz.source.variants;
     const v=variants[Math.floor(Math.random()*variants.length)];
@@ -133,7 +156,7 @@ async function start(){
 function render(){
   document.body.className="quiz-active";
   document.body.innerHTML=`<div class="quiz-app">
-    <header class="quiz-nav"><div class="quiz-nav-inner"><div class="quiz-brand"><span class="brand-mark small-mark">I</span><span>IARCO Assessment</span></div><div class="timer" id="timerBox"><span class="timer-label">TIME LEFT</span><strong id="time">--:--</strong></div></div><div class="assessment-progress"><div class="assessment-progress-row"><span id="progressText">0 of ${quiz.questions.length} answered</span><span>${esc(quiz.time_limit_minutes)} min assessment</span></div><div class="progress-track"><div id="progressBar" class="progress-bar" style="width:0%"></div></div></div></header>
+    <header class="quiz-nav"><div class="quiz-nav-inner"><div class="quiz-brand"><span class="brand-mark small-mark">I</span><span>IARCO Assessment</span></div><div class="quiz-status-center"><div class="status-kicker">ASSESSMENT PROGRESS</div><div class="status-main"><span id="progressText">0 of ${quiz.questions.length} answered</span><span class="status-divider">•</span><span>${esc(quiz.time_limit_minutes)} min</span></div></div><div class="timer" id="timerBox"><span class="timer-label">TIME LEFT</span><strong id="time">--:--</strong></div></div><div class="assessment-progress"><div class="assessment-progress-row"><span>Progress</span><span id="progressPercent">0%</span></div><div class="progress-track"><div id="progressBar" class="progress-bar" style="width:0%"></div></div></div></header>
     <main class="quiz-main"><section class="quiz-intro-card"><div><div class="eyebrow">SECURE ASSESSMENT</div><h1>Answer each question carefully</h1><p>Questions and options have been randomized for this attempt.</p></div><div class="question-count">${quiz.questions.length} Questions</div></section>
     <form id="form">${quiz.questions.map((q,i)=>`<section class="question-card" id="question_${esc(q.id)}"><div class="question-top"><span class="question-index">${String(i+1).padStart(2,"0")}</span><span class="question-type">${q.type==='single'?'Single choice':q.type==='multi'?'Multiple choice':'Short answer'}</span></div><h2>${esc(q.question)}</h2><div class="answer-list">${q.type==="single"?q.options.map((o,j)=>`<label class="option"><input type="radio" name="q_${esc(q.id)}" value="${esc(o)}"><span class="option-key">${String.fromCharCode(65+j)}</span><span>${esc(o)}</span></label>`).join(""):q.type==="multi"?q.options.map((o,j)=>`<label class="option"><input type="checkbox" name="q_${esc(q.id)}" value="${esc(o)}"><span class="option-key">${String.fromCharCode(65+j)}</span><span>${esc(o)}</span></label>`).join(""):`<textarea class="answer-text" name="q_${esc(q.id)}" maxlength="500" placeholder="Type your answer here..."></textarea>`}</div></section>`).join("")}<div class="submit-bar"><div><strong>Ready to submit?</strong><span>Review your answers before finishing.</span></div><button type="submit" class="btn gold">Submit Assessment <span>→</span></button></div></form></main></div>`;
   const form=document.querySelector("#form");
@@ -144,7 +167,7 @@ function render(){
 function updateProgress(){
   if(!quiz)return;let answered=0;
   for(const q of quiz.questions){const els=[...document.querySelectorAll(`[name="q_${CSS.escape(q.id)}"]`)];if(q.type==="multi"?els.some(x=>x.checked):q.type==="text"?String(els[0]?.value??"").trim().length>0:els.some(x=>x.checked))answered++;}
-  const pct=Math.round(answered/quiz.questions.length*100);const t=document.querySelector("#progressText"),b=document.querySelector("#progressBar");if(t)t.textContent=`${answered} of ${quiz.questions.length} answered`;if(b)b.style.width=`${pct}%`;
+  const pct=Math.round(answered/quiz.questions.length*100);const t=document.querySelector("#progressText"),p=document.querySelector("#progressPercent"),b=document.querySelector("#progressBar");if(t)t.textContent=`${answered} of ${quiz.questions.length} answered`;if(p)p.textContent=`${pct}%`;if(b)b.style.width=`${pct}%`;
 }
 
 function answers(){
@@ -231,15 +254,24 @@ async function generateCertificatePdf(score,total,percentile,timeTaken,duration)
   page.drawText(studentId,{x:700,y:500,size:9,font:normal});page.drawText(role+" Category",{x:490,y:283,size:14,font:normal});page.drawText(date,{x:530,y:260,size:14,font:normal});
   const qr=await qrDataUrl(`ID: ${studentId}\nName: ${name}\nInstitute: ${school}\nCategory: ${role}\nYear: ${year}\nScore: ${score}/${total}\nPercentile: ${Number(percentile).toFixed(2)}%\nAssessment Time: ${formatSeconds(timeTaken)}\nTotal Duration: ${duration} minutes\nVerify at: https://cert.iarco.org`);
   const qrBytes=await fetch(qr).then(r=>r.arrayBuffer());const qrImg=await pdf.embedPng(qrBytes);page.drawImage(qrImg,{x:700,y:400,width:90,height:90});
-  const metadata={
-    title:`${String(user?.program||"IARCO Assessment")} Certificate - ${name}`,
+  const CERT_METADATA={
+    titlePrefix:"IARCO Assessment Certificate",
     author:"IARCO",
-    subject:`Participation Certificate | ${String(user?.program||"IARCO Assessment")}`,
-    keywords:[studentId,String(user?.program||""),String(user?.batch||""),String(user?.role||user?.category||""),year].filter(Boolean),
+    subject:"IARCO Assessment Certificate",
     creator:"IARCO Secure Assessment Portal",
-    producer:"IARCO Secure Assessment Portal",
-    creationDate:new Date(),
-    modificationDate:new Date()
+    producer:"Sanaul Haque IARCO Host",
+    producedDate:"2026-08-20T00:00:00+06:00"
+  };
+  const producedAt=new Date(CERT_METADATA.producedDate);
+  const metadata={
+    title:`${CERT_METADATA.titlePrefix} - ${name}`,
+    author:CERT_METADATA.author,
+    subject:CERT_METADATA.subject,
+    keywords:[studentId,String(user?.program||""),String(user?.batch||""),String(user?.role||user?.category||""),year].filter(Boolean),
+    creator:CERT_METADATA.creator,
+    producer:CERT_METADATA.producer,
+    creationDate:producedAt,
+    modificationDate:producedAt
   };
   pdf.setTitle(metadata.title);pdf.setAuthor(metadata.author);pdf.setSubject(metadata.subject);pdf.setKeywords(metadata.keywords);pdf.setCreator(metadata.creator);pdf.setProducer(metadata.producer);pdf.setCreationDate(metadata.creationDate);pdf.setModificationDate(metadata.modificationDate);
   return {base64:bytesToBase64(await pdf.save())};
@@ -260,4 +292,4 @@ async function submit(reason){
 }
 
 try{user=JSON.parse(localStorage.getItem("iarco_quiz_user")||"null")}catch{user=null}
-user&&safeEmail()?home():login();
+(async()=>{const ok=await environmentCheck(true);if(ok){user&&safeEmail()?home():login();}})();
