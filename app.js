@@ -301,18 +301,53 @@ async function generateCertificatePdf(score,total,percentile,timeTaken,duration)
 }
 
 
+function showSubmissionProgress(){
+  document.querySelector('#submissionProgress')?.remove();
+  const el=document.createElement('div');el.id='submissionProgress';el.className='modal-backdrop submission-progress-backdrop';
+  el.innerHTML=`<div class="modal-card submission-progress-card" role="status" aria-live="polite" aria-busy="true">
+    <div class="submission-progress-icon"><span class="submission-spinner"></span></div>
+    <div class="eyebrow">SECURE SUBMISSION</div>
+    <h2 id="submitProgressTitle">Saving your assessment</h2>
+    <p id="submitProgressMessage" class="muted">Please keep this page open while we securely save your answers.</p>
+    <div class="submission-progress-track"><div id="submitProgressBar" class="submission-progress-fill" style="width:12%"></div></div>
+    <div class="submission-progress-steps"><span id="submitStep1" class="active">1. Save answers</span><span id="submitStep2">2. Prepare certificate</span><span id="submitStep3">3. Send certificate</span></div>
+    <p class="submission-progress-note">Do not close or refresh this page until processing is complete.</p>
+  </div>`;
+  document.body.appendChild(el);
+  return {
+    set(step,title,message){
+      const widths={1:18,2:52,3:82,4:100};
+      const bar=document.querySelector('#submitProgressBar');if(bar)bar.style.width=(widths[step]||18)+'%';
+      const t=document.querySelector('#submitProgressTitle'),m=document.querySelector('#submitProgressMessage');if(t)t.textContent=title;if(m)m.textContent=message;
+      [1,2,3].forEach(n=>{const x=document.querySelector(`#submitStep${n}`);if(x)x.classList.toggle('active',n<=step)});
+    },
+    finish(){const bar=document.querySelector('#submitProgressBar');if(bar)bar.style.width='100%';const icon=document.querySelector('.submission-progress-icon');if(icon)icon.innerHTML='<span class="submission-success">✓</span>';}
+  };
+}
+async function allowProgressPaint(){await new Promise(requestAnimationFrame);await new Promise(requestAnimationFrame);}
+
 async function submit(reason){
   if(submitting)return;submitting=true;clearInterval(timer);const timeTaken=Math.max(0,Math.round((Date.now()-startedAt)/1000));
+  const progress=showSubmissionProgress();
   try{
-    const r=await api("submit",{attempt_id:attemptId,email:safeEmail(),answers:answers(),time_taken:timeTaken,reason,variant_id:quiz.variant_id});
-    let emailStatus="PENDING_CERTIFICATE",certificateFile="",certificateError="";
-    if(reason!=="CHEATING"){
-      try{const cert=await generateCertificatePdf(r.score,r.total_questions,r.percentile,r.time_taken,r.duration_minutes);const sent=await api("certificate_upload",{attempt_id:attemptId,email:safeEmail(),certificate_pdf_base64:cert.base64});emailStatus=sent.email_status||"FAILED";certificateFile=sent.certificate_file||"";certificateError=sent.email_error||"";}
-      catch(certErr){emailStatus="FAILED";certificateError=certErr.message||"Unknown certificate error";}
+    await allowProgressPaint();
+    progress.set(1,'Saving your assessment','Your answers are being securely recorded in the assessment database.');
+    const r=await api('submit',{attempt_id:attemptId,email:safeEmail(),answers:answers(),time_taken:timeTaken,reason,variant_id:quiz.variant_id});
+    let emailStatus='PENDING_CERTIFICATE',certificateFile='',certificateError='';
+    if(reason!=='CHEATING'){
+      try{
+        progress.set(2,'Preparing your certificate','Your result is saved. We are now generating your certificate PDF.');
+        await allowProgressPaint();
+        const cert=await generateCertificatePdf(r.score,r.total_questions,r.percentile,r.time_taken,r.duration_minutes);
+        progress.set(3,'Sending your certificate','Your certificate is ready. We are securely sending it to your registered email address.');
+        await allowProgressPaint();
+        const sent=await api('certificate_upload',{attempt_id:attemptId,email:safeEmail(),certificate_pdf_base64:cert.base64});emailStatus=sent.email_status||'FAILED';certificateFile=sent.certificate_file||'';certificateError=sent.email_error||'';
+      }catch(certErr){emailStatus='FAILED';certificateError=certErr.message||'Unknown certificate error';}
     }
-    const s={status:r.status||"COMPLETED",attempt_id:attemptId,score:r.score,total_questions:r.total_questions,percentile:r.percentile,submitted_at:r.submitted_at,time_taken:r.time_taken,duration_minutes:r.duration_minutes,email_status:emailStatus,certificate_file:certificateFile,certificate_error:certificateError};save(s);
-    setPage(`<main class="portal-shell"><section class="student-card completion-card"><div class="result-hero"><div class="result-icon">✓</div><div><div class="eyebrow">SUBMISSION RECEIVED</div><h1>Assessment saved successfully</h1><p>Your answers and result are recorded in the assessment system.</p></div></div><div class="stats-grid"><div class="stat"><span>Score</span><b>${esc(r.score)}/${esc(r.total_questions)}</b></div><div class="stat"><span>Time taken</span><b>${formatSeconds(r.time_taken)}</b></div><div class="stat"><span>Duration</span><b>${esc(r.duration_minutes)} min</b></div></div><div class="certificate-status ${emailStatus==='SENT'?'good':'warn'}"><strong>Certificate: ${esc(emailStatus)}</strong>${certificateFile?`<br><span>${esc(certificateFile)}</span>`:""}${certificateError?`<br><span>${esc(certificateError)}</span>`:""}${emailStatus!=='SENT'?`<br><span>The assessment itself is saved. The administrator can inspect the error and resend when the certificate file is available.</span>`:""}</div></section></main>`);
-  }catch(e){submitting=false;alert(e.message||"Submission failed");startTimer()}
+    progress.set(4,'Submission complete','Your assessment has been fully processed.');progress.finish();await new Promise(r=>setTimeout(r,450));
+    const s={status:r.status||'COMPLETED',attempt_id:attemptId,score:r.score,total_questions:r.total_questions,percentile:r.percentile,submitted_at:r.submitted_at,time_taken:r.time_taken,duration_minutes:r.duration_minutes,email_status:emailStatus,certificate_file:certificateFile,certificate_error:certificateError};save(s);
+    setPage(`<main class="portal-shell"><section class="student-card completion-card"><div class="result-hero"><div class="result-icon">✓</div><div><div class="eyebrow">SUBMISSION RECEIVED</div><h1>Assessment saved successfully</h1><p>Your answers and result are recorded in the assessment system.</p></div></div><div class="stats-grid"><div class="stat"><span>Score</span><b>${esc(r.score)}/${esc(r.total_questions)}</b></div><div class="stat"><span>Time taken</span><b>${formatSeconds(r.time_taken)}</b></div><div class="stat"><span>Duration</span><b>${esc(r.duration_minutes)} min</b></div></div><div class="certificate-status ${emailStatus==='SENT'?'good':'warn'}"><strong>Certificate: ${esc(emailStatus)}</strong>${certificateFile?`<br><span>${esc(certificateFile)}</span>`:''}${certificateError?`<br><span>${esc(certificateError)}</span>`:''}${emailStatus!=='SENT'?`<br><span>The assessment itself is saved. The administrator can inspect the error and resend when the certificate file is available.</span>`:''}</div></section></main>`);
+  }catch(e){document.querySelector('#submissionProgress')?.remove();submitting=false;alert(e.message||'Submission failed');startTimer();}
 }
 
 try{user=JSON.parse(localStorage.getItem("iarco_quiz_user")||"null")}catch{user=null}

@@ -14,3 +14,39 @@ h1,h2,h3,p{margin-top:0}.auth-card h1{font-size:2rem;margin-bottom:8px}.form-gro
 @media(max-width:480px){.shell,.portal-shell,.auth-shell{padding:10px}.auth-card,.student-card{padding:17px}.modal-card{padding:19px}.modal-summary{grid-template-columns:1fr}.modal-actions{flex-direction:column}.modal-actions .btn{width:100%}.info-grid,.stats-grid{grid-template-columns:1fr 1fr}.quiz-main{padding:14px 10px 65px}.question-card{padding:17px}.quiz-nav-inner{padding:9px 11px}.quiz-brand{font-size:.9rem}.timer{padding:7px 11px}.timer strong{font-size:1.15rem}}
 
 .cheat-backdrop{background:rgba(127,29,29,.88)!important}.cheat-card{border:2px solid #ef4444}.danger-icon{background:#b91c1c}.danger-text{color:#b91c1c!important}.cheat-message{font-size:1rem;line-height:1.65;margin:20px 0}.violation-reason{padding:14px;border-radius:14px;background:#fef2f2;border:1px solid #fecaca}.violation-reason span{display:block;color:#991b1b;font-size:.75rem;font-weight:800;text-transform:uppercase}.violation-reason strong{display:block;margin-top:4px;color:#7f1d1d}.danger-btn{background:#b91c1c;color:#fff}.danger-btn:hover{background:#991b1b}
+.submission-progress-backdrop{background:rgba(2,6,23,.86)!important;backdrop-filter:blur(5px)}
+.submission-progress-card{max-width:620px;text-align:center;padding:34px 32px}
+.submission-progress-icon{width:66px;height:66px;margin:0 auto 18px;border-radius:20px;display:grid;place-items:center;background:#eff6ff;color:var(--blue)}
+.submission-spinner{width:30px;height:30px;border:4px solid #cbd5e1;border-top-color:var(--blue);border-radius:50%;animation:submissionSpin .8s linear infinite}
+.submission-success{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#166534;color:#fff;font-weight:1000;font-size:1.15rem}
+.submission-progress-card h2{margin:4px 0 8px;font-size:1.45rem}.submission-progress-card .muted{max-width:500px;margin:0 auto 20px;line-height:1.55}
+.submission-progress-track{height:11px;background:#e2e8f0;border-radius:99px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(15,23,42,.08)}
+.submission-progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--gold));border-radius:99px;transition:width .35s ease}
+.submission-progress-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;font-size:.72rem;font-weight:900;color:#94a3b8}.submission-progress-steps span.active{color:var(--blue)}
+.submission-progress-note{margin:18px 0 0;color:#64748b;font-size:.76rem;font-weight:700}
+@keyframes submissionSpin{to{transform:rotate(360deg)}}
+@media(max-width:520px){.submission-progress-card{padding:25px 19px}.submission-progress-steps{font-size:.65rem}}
+.submission-progress-backdrop{background:rgba(2,6,23,.86)!important;backdrop-filter:blur(5px)}
+.submission-progress-card{max-width:620px;text-align:center;padding:34px 32px}
+.submission-progress-icon{width:66px;height:66px;margin:0 auto 18px;border-radius:20px;display:grid;place-items:center;background:#eff6ff;color:var(--blue)}
+.submission-spinner{width:30px;height:30px;border:4px solid #cbd5e1;border-top-color:var(--blue);border-radius:50%;animation:submissionSpin .8s linear infinite}
+.submission-success{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#166534;color:#fff;font-weight:1000;font-size:1.15rem}
+.submission-progress-card h2{margin:4px 0 8px;font-size:1.45rem}.submission-progress-card .muted{max-width:500px;margin:0 auto 20px;line-height:1.55}
+.submission-progress-track{height:11px;background:#e2e8f0;border-radius:99px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(15,23,42,.08)}
+.submission-progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--gold));border-radius:99px;transition:width .35s ease}
+.submission-progress-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;font-size:.72rem;font-weight:900;color:#94a3b8}.submission-progress-steps span.active{color:var(--blue)}
+.submission-progress-note{margin:18px 0 0;color:#64748b;font-size:.76rem;font-weight:700}
+@keyframes submissionSpin{to{transform:rotate(360deg)}}
+@media(max-width:520px){.submission-progress-card{padding:25px 19px}.submission-progress-steps{font-size:.65rem}}
+.submission-progress-backdrop{background:rgba(2,6,23,.86)!important;backdrop-filter:blur(5px)}
+.submission-progress-card{max-width:620px;text-align:center;padding:34px 32px}
+.submission-progress-icon{width:66px;height:66px;margin:0 auto 18px;border-radius:20px;display:grid;place-items:center;background:#eff6ff;color:var(--blue)}
+.submission-spinner{width:30px;height:30px;border:4px solid #cbd5e1;border-top-color:var(--blue);border-radius:50%;animation:submissionSpin .8s linear infinite}
+.submission-success{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#166534;color:#fff;font-weight:1000;font-size:1.15rem}
+.submission-progress-card h2{margin:4px 0 8px;font-size:1.45rem}.submission-progress-card .muted{max-width:500px;margin:0 auto 20px;line-height:1.55}
+.submission-progress-track{height:11px;background:#e2e8f0;border-radius:99px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(15,23,42,.08)}
+.submission-progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--gold));border-radius:99px;transition:width .35s ease}
+.submission-progress-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;font-size:.72rem;font-weight:900;color:#94a3b8}.submission-progress-steps span.active{color:var(--blue)}
+.submission-progress-note{margin:18px 0 0;color:#64748b;font-size:.76rem;font-weight:700}
+@keyframes submissionSpin{to{transform:rotate(360deg)}}
+@media(max-width:520px){.submission-progress-card{padding:25px 19px}.submission-progress-steps{font-size:.65rem}}
