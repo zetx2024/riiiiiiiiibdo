@@ -1,4 +1,4 @@
-const CACHE_NAME = 'iarco-secure-quiz-v8';
+const CACHE_NAME = 'iarco-secure-quiz-v9-certfix';
 const CORE = [
   './', './index.html', './styles.css', './app.js', './quiz.json', './users.json', './sw.js',
   'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js',
