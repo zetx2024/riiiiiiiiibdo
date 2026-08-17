@@ -208,6 +208,9 @@ function guards(){
   },{capture:true});
 
   // Fullscreen is only a usability/security request. Leaving fullscreen is NOT a violation.
+  // No window.blur/focus handler is installed: ordinary clicks and fullscreen transitions are never violations.
+  // Browser pages cannot reliably detect or stop external OS-level capture by Zoom/Meet. The server also
+  // sends Permissions-Policy: display-capture=() so this assessment origin cannot initiate browser screen capture.
   try{document.documentElement.requestFullscreen?.().catch(()=>{});}catch(_){}
   setTimeout(()=>{guardsArmed=true;},1200);
 }
