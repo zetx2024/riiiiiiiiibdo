@@ -11,7 +11,7 @@ const save=x=>localStorage.setItem(key(),JSON.stringify(x));
 async function api(action,p={}){
   const r=await fetch(`${API}?action=${encodeURIComponent(action)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
   const j=await r.json().catch(()=>({ok:false,message:`Server returned ${r.status}`}));
-  if(!r.ok||!j.ok) throw Error(j.message||`Server error (${r.status})`);
+  if(!r.ok||!j.ok){const err=Error(j.message||`Server error (${r.status})`);err.blocked=!!j.blocked;err.status=r.status;throw err;}
   return j;
 }
 
@@ -75,7 +75,12 @@ function login(){
       localStorage.setItem("iarco_quiz_user",JSON.stringify(user));
       await api("login",user);
       await home();
-    }catch(e){msg.className="form-message error";msg.textContent=e.message||"Login failed";}
+    }catch(e){
+      msg.className="form-message error";
+      if(e.blocked){
+        msg.innerHTML=`<strong>Access blocked</strong><br>${esc(e.message||"This account has been blocked from the assessment portal.")}<br><span class="muted">Please contact the assessment administrator if you believe this is an error.</span>`;
+      }else msg.textContent=e.message||"Login failed";
+    }
   };
   document.querySelector("#login").onclick=go;
   document.querySelectorAll("#email,#password").forEach(i=>i.addEventListener("keydown",e=>{if(e.key==="Enter")go()}));
@@ -111,7 +116,7 @@ async function home(){
     c.innerHTML=`<div class="assessment-intro"><div class="intro-icon">Q</div><div><h2>Ready for your assessment?</h2><p>Questions and answer options are randomized for each attempt.</p></div></div>
       <div class="info-grid"><div><span>Participant</span><b>${esc(name)}</b></div><div><span>Program</span><b>${esc(program)}</b></div><div><span>Category</span><b>${esc(user?.category||user?.role||"Participant")}</b></div><div><span>Year</span><b>${esc(user?.years||new Date().getFullYear())}</b></div></div>
       <button id="start" class="btn gold full start-btn">Start Assessment <span>→</span></button>`;
-    document.querySelector("#start").onclick=async()=>{try{await loadQuiz();instructions()}catch(e){alert(e.message)}};
+    document.querySelector("#start").onclick=async()=>{try{await loadQuiz();instructions()}catch(e){showInlineError(e.message||"Unable to load the assessment.")}};
   }
 }
 
@@ -124,6 +129,13 @@ async function loadQuiz(){
   const valid=q.variants.filter(v=>v&&v.id&&Array.isArray(v.questions)&&v.questions.length);
   if(!valid.length)throw Error("Quiz variants are configured incorrectly.");
   quiz={source:{...q,variants:valid},time_limit_minutes:Number(q.time_limit_minutes)||15,source_url:r.source_url||""};
+}
+
+function showInlineError(message){
+  const old=document.querySelector("#appErrorModal");old?.remove();
+  const el=document.createElement("div");el.id="appErrorModal";el.className="modal-backdrop";
+  el.innerHTML=`<div class="modal-card" role="alertdialog" aria-modal="true"><div class="modal-top"><div class="modal-icon danger-icon">!</div><div><div class="eyebrow danger-text">ASSESSMENT NOTICE</div><h2>Unable to continue</h2></div></div><p class="muted">${esc(message)}</p><div class="modal-actions"><button id="closeAppError" class="btn gold full">Close</button></div></div>`;
+  document.body.appendChild(el);el.querySelector("#closeAppError").onclick=()=>el.remove();
 }
 
 function instructions(){
@@ -153,7 +165,7 @@ async function start(){
     const r=await api("start",{email:safeEmail(),name:user.name||"",institution:user.institution||user.school||"",country:user.country||"",category:user.category||user.role||"",variant_id:quiz.variant_id,participant_id:user.participant_id||user.id||"",program:user.program||"",batch:user.batch||"",image:user.image||"",role:user.role||"",participation_date:user.date||"",years:user.years||"",session_id:user.session_id||""});
     attemptId=r.attempt_id;startedAt=Date.now();save({status:"STARTED",attempt_id:attemptId,variant_id:quiz.variant_id,duration_minutes:quiz.time_limit_minutes});
     document.querySelector("#modal")?.remove();render();guards();startTimer();
-  }catch(e){alert(e.message||"Could not start the assessment.")}
+  }catch(e){showInlineError(e.message||"Could not start the assessment.")}
 }
 
 function render(){
@@ -182,19 +194,33 @@ function startTimer(){let s=(quiz.time_limit_minutes||15)*60;const tick=()=>{con
 function guards(){
   const b=e=>e.preventDefault();
   for(const n of ["contextmenu","copy","cut","selectstart","dragstart"])document.addEventListener(n,b,{capture:true});
-  // Page Visibility is the exact signal for a tab switch.
+
+  // IMPORTANT: only the Page Visibility API is treated as a tab/window navigation violation.
+  // window.blur is intentionally NOT a violation because browsers can emit blur during
+  // ordinary clicks, fullscreen transitions, permission prompts, address-bar interaction, etc.
+  let armed=false;
+  setTimeout(()=>{armed=true;},1200);
+  let lastHiddenAt=0;
   document.addEventListener("visibilitychange",()=>{
-    if(document.visibilityState==="hidden"&&!submitting) violate("TAB_SWITCH","document.visibilityState=hidden");
+    if(document.visibilityState==="hidden" && armed && !submitting){
+      const now=Date.now();
+      if(now-lastHiddenAt>500){
+        lastHiddenAt=now;
+        violate("TAB_SWITCH",`visibility=hidden;hidden_at=${new Date(now).toISOString()}`);
+      }
+    }
   },{capture:true});
-  // Window blur is kept separate for focus loss while the document is still visible.
+
+  // Focus loss is harmless telemetry only; it never ends an assessment.
   window.addEventListener("blur",()=>{
-    if(!submitting && document.visibilityState==="visible") violate("WINDOW_BLUR","window.blur while document remained visible");
+    if(!submitting) window.__iarcoLastBlur=Date.now();
   },{capture:true});
+
   window.addEventListener("beforeunload",e=>{if(!submitting){e.preventDefault();e.returnValue="";}});
   document.addEventListener("keydown",e=>{
     const k=String(e.key??"").toLowerCase();
     const blocked=e.key==="F12"||((e.ctrlKey||e.metaKey)&&["a","c","u","s","p"].includes(k))||(e.ctrlKey&&e.shiftKey&&["i","j","c"].includes(k));
-    if(blocked){e.preventDefault();if(!submitting)violate("BLOCKED_SHORTCUT",`key=${e.key};ctrl=${e.ctrlKey};shift=${e.shiftKey};alt=${e.altKey}`);}
+    if(blocked){e.preventDefault();if(armed&&!submitting)violate("BLOCKED_SHORTCUT",`key=${e.key};ctrl=${e.ctrlKey};shift=${e.shiftKey};alt=${e.altKey}`);}
   },{capture:true});
   try{document.documentElement.requestFullscreen?.().catch(()=>{});}catch(_){}
 }
@@ -220,6 +246,7 @@ function cheatingModal(reason){
 
 async function violate(reason,details=""){
   if(submitting)return;
+  // Lock the assessment immediately so a second event cannot race the first.
   submitting=true;
   clearInterval(timer);
   let recorded=false;
@@ -227,12 +254,14 @@ async function violate(reason,details=""){
     const r=await api("violation",{attempt_id:attemptId,email:safeEmail(),reason,details});
     recorded=!!r.recorded;
   }catch(e){
+    // Beacon is a best-effort fallback only. The server-side attempt remains closed
+    // whenever the primary request reaches the server.
     try{
       const payload=JSON.stringify({attempt_id:attemptId,email:safeEmail(),reason,details});
       navigator.sendBeacon(`${API}?action=violation`,new Blob([payload],{type:"application/json"}));
     }catch(_){}
   }
-  cheatingModal(recorded?reason:`${reason} (server acknowledgement pending)`);
+  cheatingModal(recorded?reason:`${reason} (recording request sent)`);
 }
 async function submit(reason){
   if(submitting)return;submitting=true;clearInterval(timer);const timeTaken=Math.max(0,Math.round((Date.now()-startedAt)/1000));
