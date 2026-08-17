@@ -20,7 +20,7 @@ async function api(action,p={},timeoutMs=15000){
 }
 
 
-const QUEUE_DB='iarco_assessment_queue_v15';
+const QUEUE_DB='iarco_assessment_queue_v17';
 const QUEUE_STORE='submissions';
 function queueDb(){return new Promise((resolve,reject)=>{const r=indexedDB.open(QUEUE_DB,1);r.onupgradeneeded=()=>{const db=r.result;if(!db.objectStoreNames.contains(QUEUE_STORE)){const st=db.createObjectStore(QUEUE_STORE,{keyPath:'client_submission_id'});st.createIndex('created_at','created_at')}};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error||new Error('Offline queue unavailable'));})}
 async function queuePut(payload){const db=await queueDb();return new Promise((resolve,reject)=>{const tx=db.transaction(QUEUE_STORE,'readwrite');tx.objectStore(QUEUE_STORE).put({...payload,created_at:payload.created_at||Date.now()});tx.oncomplete=()=>resolve(true);tx.onerror=()=>reject(tx.error||new Error('Could not save offline submission'));})}
@@ -147,9 +147,13 @@ async function home(){
   if(s?.status==="COMPLETED"){
     c.innerHTML=`<div class="result-hero"><div class="result-icon">✓</div><div><div class="eyebrow">ASSESSMENT COMPLETED</div><h2>Thank you for participating</h2><p>Your result has been securely recorded.</p></div></div>
       <div class="stats-grid"><div class="stat"><span>Score</span><b>${esc(s.score)}/${esc(s.total_questions)}</b></div><div class="stat"><span>Time taken</span><b>${formatSeconds(s.time_taken)}</b></div><div class="stat"><span>Total duration</span><b>${esc(s.duration_minutes)} min</b></div></div>
-      <div class="certificate-status ${s.email_status==='SENT'?'good':'warn'}"><strong>Certificate delivery:</strong> ${esc(s.email_status||"PENDING")}<br><span>${esc(s.certificate_file||"Certificate processing is in progress.")}</span></div>
+      <div class="certificate-status ${s.email_status==='SENT'?'good':'warn'}"><strong>Certificate delivery:</strong> ${esc(s.email_status||"PENDING")}<br><span>${esc(s.certificate_file||"Certificate processing is in progress.")}</span>${s.certificate_file?`<br><button type="button" id="downloadCertificateBtn" class="btn gold" style="margin-top:12px">Download Certificate</button>`:''}</div>
       <p class="muted center-note">Another attempt is available only after an administrator deletes this submission.</p>`;
-  }else if(s?.status==="CHEATED"){
+  if(s?.status==="COMPLETED" && s?.certificate_file){
+    const btn=document.querySelector('#downloadCertificateBtn');
+    if(btn) btn.onclick=()=>downloadCertificate(s.attempt_id);
+  }
+    }else if(s?.status==="CHEATED"){
     c.innerHTML=`<div class="status-panel danger-panel"><strong>Attempt closed</strong><p>${esc(name)}, a quiz security violation was recorded. Please contact the administrator.</p></div>`;
   }else if(s?.status==="STARTED"){
     c.innerHTML=`<div class="status-panel warning-panel"><strong>Attempt already registered</strong><p>An assessment attempt is already active or was not completed. Contact the administrator if you need assistance.</p></div>`;
