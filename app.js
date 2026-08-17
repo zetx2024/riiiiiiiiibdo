@@ -179,24 +179,37 @@ function answers(){
 function formatSeconds(sec){sec=Math.max(0,Number(sec)||0);return `${Math.floor(sec/60)} min ${String(sec%60).padStart(2,"0")} sec`}
 function startTimer(){let s=(quiz.time_limit_minutes||15)*60;const tick=()=>{const e=document.querySelector("#time"),box=document.querySelector("#timerBox");if(!e)return;e.textContent=`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;if(box)box.classList.toggle("critical",s<=15);if(s<=0){clearInterval(timer);submit("TIMEOUT");return}s--};tick();timer=setInterval(tick,1000)}
 
+let guardsArmed=false;
 function guards(){
   const b=e=>e.preventDefault();
   for(const n of ["contextmenu","copy","cut","selectstart","dragstart"])document.addEventListener(n,b,{capture:true});
-  // Page Visibility is the exact signal for a tab switch.
+
+  // Do NOT use window.blur as a cheating signal. Browsers fire blur for ordinary clicks,
+  // fullscreen transitions, permission prompts and other harmless focus changes.
+  // A tab switch is recorded only when the page actually becomes hidden.
   document.addEventListener("visibilitychange",()=>{
-    if(document.visibilityState==="hidden"&&!submitting) violate("TAB_SWITCH","document.visibilityState=hidden");
+    if(!guardsArmed || submitting) return;
+    if(document.visibilityState==="hidden") violate("TAB_SWITCH","document.visibilityState=hidden");
   },{capture:true});
-  // Window blur is kept separate for focus loss while the document is still visible.
-  window.addEventListener("blur",()=>{
-    if(!submitting && document.visibilityState==="visible") violate("WINDOW_BLUR","window.blur while document remained visible");
-  },{capture:true});
-  window.addEventListener("beforeunload",e=>{if(!submitting){e.preventDefault();e.returnValue="";}});
+
+  window.addEventListener("beforeunload",e=>{
+    if(!submitting && guardsArmed){e.preventDefault();e.returnValue="";}
+  });
+
   document.addEventListener("keydown",e=>{
+    if(!guardsArmed || submitting) return;
     const k=String(e.key??"").toLowerCase();
     const blocked=e.key==="F12"||((e.ctrlKey||e.metaKey)&&["a","c","u","s","p"].includes(k))||(e.ctrlKey&&e.shiftKey&&["i","j","c"].includes(k));
-    if(blocked){e.preventDefault();if(!submitting)violate("BLOCKED_SHORTCUT",`key=${e.key};ctrl=${e.ctrlKey};shift=${e.shiftKey};alt=${e.altKey}`);}
+    if(blocked){
+      e.preventDefault();
+      e.stopPropagation();
+      violate("BLOCKED_SHORTCUT",`key=${e.key};ctrl=${e.ctrlKey};shift=${e.shiftKey};alt=${e.altKey}`);
+    }
   },{capture:true});
+
+  // Fullscreen is only a usability/security request. Leaving fullscreen is NOT a violation.
   try{document.documentElement.requestFullscreen?.().catch(()=>{});}catch(_){}
+  setTimeout(()=>{guardsArmed=true;},1200);
 }
 
 function cheatingModal(reason){
