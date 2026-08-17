@@ -8,12 +8,56 @@ const key=()=>`iarco_quiz_state_${safeEmail()}`;
 const read=()=>{try{return JSON.parse(localStorage.getItem(key())||"null")}catch{return null}};
 const save=x=>localStorage.setItem(key(),JSON.stringify(x));
 
-async function api(action,p={}){
-  const r=await fetch(`${API}?action=${encodeURIComponent(action)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
-  const j=await r.json().catch(()=>({ok:false,message:`Server returned ${r.status}`}));
-  if(!r.ok||!j.ok) throw Error(j.message||`Server error (${r.status})`);
-  return j;
+async function api(action,p={},timeoutMs=15000){
+  const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),timeoutMs);
+  try{
+    const r=await fetch(`${API}?action=${encodeURIComponent(action)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p),signal:controller.signal});
+    const j=await r.json().catch(()=>({ok:false,message:`Server returned ${r.status}`}));
+    if(!r.ok||!j.ok) throw Error(j.message||`Server error (${r.status})`);
+    return j;
+  }catch(e){if(e?.name==='AbortError')throw Error('The assessment server is busy or the connection is taking too long. Your submission will be safely queued for retry.');throw e;}
+  finally{clearTimeout(timeout);}
 }
+
+
+const QUEUE_DB='iarco_assessment_queue_v14';
+const QUEUE_STORE='submissions';
+function queueDb(){return new Promise((resolve,reject)=>{const r=indexedDB.open(QUEUE_DB,1);r.onupgradeneeded=()=>{const db=r.result;if(!db.objectStoreNames.contains(QUEUE_STORE)){const st=db.createObjectStore(QUEUE_STORE,{keyPath:'client_submission_id'});st.createIndex('created_at','created_at')}};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error||new Error('Offline queue unavailable'));})}
+async function queuePut(payload){const db=await queueDb();return new Promise((resolve,reject)=>{const tx=db.transaction(QUEUE_STORE,'readwrite');tx.objectStore(QUEUE_STORE).put({...payload,created_at:payload.created_at||Date.now()});tx.oncomplete=()=>resolve(true);tx.onerror=()=>reject(tx.error||new Error('Could not save offline submission'));})}
+async function queueAll(){const db=await queueDb();return new Promise((resolve,reject)=>{const tx=db.transaction(QUEUE_STORE,'readonly');const r=tx.objectStore(QUEUE_STORE).getAll();r.onsuccess=()=>resolve(r.result||[]);r.onerror=()=>reject(r.error);})}
+async function queueDelete(id){const db=await queueDb();return new Promise((resolve,reject)=>{const tx=db.transaction(QUEUE_STORE,'readwrite');tx.objectStore(QUEUE_STORE).delete(id);tx.oncomplete=()=>resolve(true);tx.onerror=()=>reject(tx.error);})}
+async function registerQueueSync(){try{if('serviceWorker' in navigator){const reg=await navigator.serviceWorker.ready;if('sync' in reg)await reg.sync.register('iarco-submit-queue');}}catch(_){} }
+async function syncQueuedSubmissions(){
+  if(!navigator.onLine)return;
+  let items=[];try{items=await queueAll()}catch{return}
+  for(const item of items){
+    try{
+      const r=await api('submit',item.payload);
+      await queueDelete(item.client_submission_id);
+      // If the student is still on the result page, refresh its state. Certificate
+      // generation is intentionally left to the foreground page because it needs
+      // PDF assets/fonts and the student's certificate delivery flow.
+      if(item.attempt_id===attemptId){
+        save({status:r.status||'COMPLETED',attempt_id:item.attempt_id,score:r.score,total_questions:r.total_questions,percentile:r.percentile,submitted_at:r.submitted_at,time_taken:r.time_taken,duration_minutes:r.duration_minutes,email_status:'PENDING_CERTIFICATE',certificate_file:'',certificate_error:''});
+        if(!submitting){submitting=true;await processCertificateAfterQueuedSubmit(r).catch(()=>{});}
+      }
+    }catch(e){
+      // Keep it queued. A later online event/background sync retries it.
+    }
+  }
+}
+async function processCertificateAfterQueuedSubmit(r){
+  const progress=showSubmissionProgress();await allowProgressPaint();
+  progress.set(2,'Preparing your certificate','Your result is saved. We are now generating your certificate PDF.');
+  const cert=await generateCertificatePdf(r.score,r.total_questions,r.percentile,r.time_taken,r.duration_minutes);
+  progress.set(3,'Sending your certificate','Your certificate is ready. We are securely sending it to your registered email address.');await allowProgressPaint();
+  const sent=await api('certificate_upload',{attempt_id:r.attempt_id,email:safeEmail(),certificate_pdf_base64:cert.base64});
+  progress.set(4,'Submission complete','Your assessment has been fully processed.');progress.finish();await new Promise(r=>setTimeout(r,450));
+  save({status:r.status||'COMPLETED',attempt_id:r.attempt_id,score:r.score,total_questions:r.total_questions,percentile:r.percentile,submitted_at:r.submitted_at,time_taken:r.time_taken,duration_minutes:r.duration_minutes,email_status:sent.email_status||'FAILED',certificate_file:sent.certificate_file||'',certificate_error:sent.email_error||''});
+  submitting=false;home();
+}
+window.addEventListener('online',()=>{syncQueuedSubmissions();});
+window.addEventListener('load',()=>{setTimeout(syncQueuedSubmissions,1200);});
 
 function protect(){
   const b=e=>e.preventDefault();
@@ -253,7 +297,7 @@ async function violate(reason,details=""){
 async function getAsset(year,asset){const r=await fetch(`${CERT_API}?action=certificate_asset&year=${encodeURIComponent(year)}&asset=${encodeURIComponent(asset)}`);if(!r.ok)throw Error(`Certificate asset unavailable (${asset}, HTTP ${r.status})`);return await r.arrayBuffer()}
 
 function ensureQrContainer(){let q=document.getElementById("qrcode");if(!q){q=document.createElement("div");q.id="qrcode";q.setAttribute("aria-hidden","true");q.style.cssText="position:fixed;left:-10000px;top:-10000px;width:100px;height:100px;overflow:hidden;";document.body.appendChild(q)}return q}
-function qrDataUrl(text){return new Promise((resolve,reject)=>{const q=ensureQrContainer();q.innerHTML="";try{if(typeof QRCode!=="function")throw Error("QR code library did not load");new QRCode(q,{text,width:90,height:90,correctLevel:QRCode.CorrectLevel.H});setTimeout(()=>{const c=q.querySelector("canvas"),img=q.querySelector("img");if(c)return resolve(c.toDataURL("image/png"));if(img)return resolve(img.src);reject(Error("QR generation failed"))},300)}catch(e){reject(e)}})}
+function qrDataUrl(text){return new Promise((resolve,reject)=>{const q=ensureQrContainer();q.innerHTML="";try{if(typeof QRCode!=="function")throw Error("QR code library did not load");new QRCode(q,{text,width:90,height:90,correctLevel:QRCode.CorrectLevel.L});setTimeout(()=>{const c=q.querySelector("canvas"),img=q.querySelector("img");if(c)return resolve(c.toDataURL("image/png"));if(img)return resolve(img.src);reject(Error("QR generation failed"))},300)}catch(e){reject(e)}})}
 function bytesToBase64(bytes){let binary="";const chunk=0x8000;for(let i=0;i<bytes.length;i+=chunk)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+chunk,bytes.length)));return btoa(binary)}
 
 async function generateCertificatePdf(score,total,percentile,timeTaken,duration){
@@ -275,7 +319,11 @@ async function generateCertificatePdf(score,total,percentile,timeTaken,duration)
   const fsN=GreatVibes?35:24,fsP=15;const textWidthN=nf.widthOfTextAtSize(name,fsN);page.drawText(name,{x:page.getWidth()/2-textWidthN/2,y:page.getHeight()/1.57,size:fsN,font:nf});
   const textWidthS=pf.widthOfTextAtSize(school,fsP);page.drawText(school,{x:page.getWidth()/2-textWidthS/2,y:page.getHeight()/1.9,size:fsP,font:pf});
   page.drawText(studentId,{x:700,y:500,size:9,font:normal});page.drawText(role+" Category",{x:490,y:283,size:14,font:normal});page.drawText(date,{x:530,y:260,size:14,font:normal});
-  const qr=await qrDataUrl(`ID: ${studentId}\nName: ${name}\nInstitute: ${school}\nCategory: ${role}\nYear: ${year}\nScore: ${score}/${total}\nPercentile: ${Number(percentile).toFixed(2)}%\nAssessment Time: ${formatSeconds(timeTaken)}\nTotal Duration: ${duration} minutes\nVerify at: https://cert.iarco.org`);
+  // Keep the QR payload deliberately short. qrcodejs has a finite capacity and the
+  // previous certificate embedded too much student/result text, causing
+  // "code length overflow" for longer records. The certificate itself contains
+  // the complete result; the QR only needs the participant identifier.
+  const qr=await qrDataUrl(`IARCO|ID:${studentId}`);
   const qrBytes=await fetch(qr).then(r=>r.arrayBuffer());const qrImg=await pdf.embedPng(qrBytes);page.drawImage(qrImg,{x:700,y:400,width:90,height:90});
   const CERT_METADATA={
     titlePrefix:"IARCO Assessment Certificate",
@@ -332,7 +380,15 @@ async function submit(reason){
   try{
     await allowProgressPaint();
     progress.set(1,'Saving your assessment','Your answers are being securely recorded in the assessment database.');
-    const r=await api('submit',{attempt_id:attemptId,email:safeEmail(),answers:answers(),time_taken:timeTaken,reason,variant_id:quiz.variant_id});
+    const clientSubmissionId=`${attemptId}-${safeEmail()}-${startedAt}`;
+    const payload={attempt_id:attemptId,email:safeEmail(),answers:answers(),time_taken:timeTaken,reason,variant_id:quiz.variant_id,client_submission_id:clientSubmissionId};
+    let r;
+    try{r=await api('submit',payload);}catch(networkErr){
+      try{await queuePut({client_submission_id:clientSubmissionId,attempt_id:attemptId,payload});await registerQueueSync();
+        progress.set(4,'Submission queued securely','Your answers are saved on this device and will be sent automatically to the assessment server when the connection is available.');progress.finish();
+        setTimeout(()=>{setPage(`<main class="portal-shell"><section class="student-card completion-card"><div class="result-hero"><div class="result-icon">✓</div><div><div class="eyebrow">SUBMISSION QUEUED</div><h1>Your assessment is safely queued</h1><p>Your answers are stored locally and will be sent automatically when the connection to the assessment server is restored.</p></div></div><div class="certificate-status warn"><strong>Certificate: PENDING SERVER SYNC</strong><br><span>Keep this browser/device available and connected. The certificate will be processed after the server receives your submission.</span></div></section></main>`);submitting=false;},500);return;
+      }catch(queueErr){throw networkErr;}
+    }
     let emailStatus='PENDING_CERTIFICATE',certificateFile='',certificateError='';
     if(reason!=='CHEATING'){
       try{
@@ -351,4 +407,5 @@ async function submit(reason){
 }
 
 try{user=JSON.parse(localStorage.getItem("iarco_quiz_user")||"null")}catch{user=null}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').then(()=>syncQueuedSubmissions()).catch(()=>{});}
 (async()=>{const ok=await environmentCheck(true);if(ok){user&&safeEmail()?home():login();}})();
