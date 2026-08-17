@@ -116,11 +116,14 @@ async function home(){
 }
 
 async function loadQuiz(){
-  const q=await fetch("quiz.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("Unable to load quiz configuration");return r.json()});
-  if(!Array.isArray(q?.variants)||!q.variants.length)throw Error("No quiz variants found in quiz.json");
+  // The server exposes the single configured quiz source from quij/config.php.
+  // This keeps frontend, scoring and admin dashboard synchronized when the JSON URL changes.
+  const r=await api("quiz_config");
+  const q=r.config;
+  if(!Array.isArray(q?.variants)||!q.variants.length)throw Error("No quiz variants found in the configured quiz JSON");
   const valid=q.variants.filter(v=>v&&v.id&&Array.isArray(v.questions)&&v.questions.length);
   if(!valid.length)throw Error("Quiz variants are configured incorrectly.");
-  quiz={source:{...q,variants:valid},time_limit_minutes:Number(q.time_limit_minutes)||15};
+  quiz={source:{...q,variants:valid},time_limit_minutes:Number(q.time_limit_minutes)||15,source_url:r.source_url||""};
 }
 
 function instructions(){
@@ -179,13 +182,19 @@ function startTimer(){let s=(quiz.time_limit_minutes||15)*60;const tick=()=>{con
 function guards(){
   const b=e=>e.preventDefault();
   for(const n of ["contextmenu","copy","cut","selectstart","dragstart"])document.addEventListener(n,b,{capture:true});
-  document.addEventListener("visibilitychange",()=>{if(document.hidden&&!submitting)violate("VISIBILITY_CHANGE")});
-  window.addEventListener("blur",()=>{if(!submitting)violate("WINDOW_BLUR")});
+  // Page Visibility is the exact signal for a tab switch.
+  document.addEventListener("visibilitychange",()=>{
+    if(document.visibilityState==="hidden"&&!submitting) violate("TAB_SWITCH","document.visibilityState=hidden");
+  },{capture:true});
+  // Window blur is kept separate for focus loss while the document is still visible.
+  window.addEventListener("blur",()=>{
+    if(!submitting && document.visibilityState==="visible") violate("WINDOW_BLUR","window.blur while document remained visible");
+  },{capture:true});
   window.addEventListener("beforeunload",e=>{if(!submitting){e.preventDefault();e.returnValue="";}});
   document.addEventListener("keydown",e=>{
     const k=String(e.key??"").toLowerCase();
     const blocked=e.key==="F12"||((e.ctrlKey||e.metaKey)&&["a","c","u","s","p"].includes(k))||(e.ctrlKey&&e.shiftKey&&["i","j","c"].includes(k));
-    if(blocked){e.preventDefault();if(!submitting)violate("BLOCKED_SHORTCUT");}
+    if(blocked){e.preventDefault();if(!submitting)violate("BLOCKED_SHORTCUT",`key=${e.key};ctrl=${e.ctrlKey};shift=${e.shiftKey};alt=${e.altKey}`);}
   },{capture:true});
   try{document.documentElement.requestFullscreen?.().catch(()=>{});}catch(_){}
 }
@@ -196,7 +205,7 @@ function cheatingModal(reason){
   el.innerHTML=`<div class="modal-card cheat-card" role="alertdialog" aria-modal="true" aria-labelledby="cheatTitle">
     <div class="modal-top"><div class="modal-icon danger-icon">!</div><div><div class="eyebrow danger-text">SECURITY VIOLATION</div><h2 id="cheatTitle">Assessment security violation detected</h2></div></div>
     <p class="cheat-message">${esc(user?.name||safeEmail())}, this event has already been recorded in the assessment database. This dialog cannot be cancelled or dismissed.</p>
-    <div class="violation-reason"><span>Recorded event</span><strong>${esc(reason)}</strong></div>
+    <div class="violation-reason"><span>Recorded activity</span><strong>${esc(reason)}</strong></div>
     <div class="modal-actions"><button id="endCheat" class="btn danger-btn full">End this assessment</button></div>
   </div>`;
   document.body.appendChild(el);
@@ -209,74 +218,22 @@ function cheatingModal(reason){
   requestAnimationFrame(()=>el.querySelector("#endCheat")?.focus());
 }
 
-async function violate(reason){
+async function violate(reason,details=""){
   if(submitting)return;
   submitting=true;
   clearInterval(timer);
   let recorded=false;
   try{
-    const r=await api("violation",{attempt_id:attemptId,email:safeEmail(),reason});
+    const r=await api("violation",{attempt_id:attemptId,email:safeEmail(),reason,details});
     recorded=!!r.recorded;
-  }catch(_){}
-  // Keep the assessment locked even if the network is temporarily unavailable.
+  }catch(e){
+    try{
+      const payload=JSON.stringify({attempt_id:attemptId,email:safeEmail(),reason,details});
+      navigator.sendBeacon(`${API}?action=violation`,new Blob([payload],{type:"application/json"}));
+    }catch(_){}
+  }
   cheatingModal(recorded?reason:`${reason} (server acknowledgement pending)`);
-  if(!recorded){
-    // Retry without exposing a cancel/continue path to the student.
-    const payload=JSON.stringify({attempt_id:attemptId,email:safeEmail(),reason});
-    try{navigator.sendBeacon(`${API}?action=violation`,new Blob([payload],{type:"application/json"}));}catch(_){}
-  }
 }
-
-async function getAsset(year,asset){const r=await fetch(`${CERT_API}?action=certificate_asset&year=${encodeURIComponent(year)}&asset=${encodeURIComponent(asset)}`);if(!r.ok)throw Error(`Certificate asset unavailable (${asset}, HTTP ${r.status})`);return await r.arrayBuffer()}
-
-function ensureQrContainer(){let q=document.getElementById("qrcode");if(!q){q=document.createElement("div");q.id="qrcode";q.setAttribute("aria-hidden","true");q.style.cssText="position:fixed;left:-10000px;top:-10000px;width:100px;height:100px;overflow:hidden;";document.body.appendChild(q)}return q}
-function qrDataUrl(text){return new Promise((resolve,reject)=>{const q=ensureQrContainer();q.innerHTML="";try{if(typeof QRCode!=="function")throw Error("QR code library did not load");new QRCode(q,{text,width:90,height:90,correctLevel:QRCode.CorrectLevel.H});setTimeout(()=>{const c=q.querySelector("canvas"),img=q.querySelector("img");if(c)return resolve(c.toDataURL("image/png"));if(img)return resolve(img.src);reject(Error("QR generation failed"))},300)}catch(e){reject(e)}})}
-function bytesToBase64(bytes){let binary="";const chunk=0x8000;for(let i=0;i<bytes.length;i+=chunk)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+chunk,bytes.length)));return btoa(binary)}
-
-async function generateCertificatePdf(score,total,percentile,timeTaken,duration){
-  if(!window.PDFLib)throw Error("PDF library did not load. Check the CDN connection.");
-  const year=String(user?.years||new Date().getFullYear());
-  const info=await api("certificate_info",{year});
-  if(!info?.url)throw Error(`No certificate template is configured for ${year}.`);
-  const bytes=await getAsset(year,"template");
-  const pdf=await PDFLib.PDFDocument.load(bytes);
-  const page=pdf.getPages()[0];
-  const studentId=String(user?.participant_id||user?.id||"");
-  const name=String(user?.name||"");const school=String(user?.school||user?.institution||"");const role=String(user?.role||user?.category||"");const date=String(user?.date||"");
-  let GreatVibes=null,PtSans=null;
-  if(window.fontkit){
-    try{pdf.registerFontkit(window.fontkit);const [font1,font2]=await Promise.all([getAsset(year,"greatvibes"),getAsset(year,"ptsans")]);GreatVibes=await pdf.embedFont(font1);PtSans=await pdf.embedFont(font2)}catch(e){console.warn("Custom fonts unavailable; using fallback fonts.",e)}
-  }
-  const normal=await pdf.embedFont(PDFLib.StandardFonts.Helvetica);const italic=await pdf.embedFont(PDFLib.StandardFonts.HelveticaOblique);
-  const nf=GreatVibes||italic,pf=PtSans||normal;
-  const fsN=GreatVibes?35:24,fsP=15;const textWidthN=nf.widthOfTextAtSize(name,fsN);page.drawText(name,{x:page.getWidth()/2-textWidthN/2,y:page.getHeight()/1.57,size:fsN,font:nf});
-  const textWidthS=pf.widthOfTextAtSize(school,fsP);page.drawText(school,{x:page.getWidth()/2-textWidthS/2,y:page.getHeight()/1.9,size:fsP,font:pf});
-  page.drawText(studentId,{x:700,y:500,size:9,font:normal});page.drawText(role+" Category",{x:490,y:283,size:14,font:normal});page.drawText(date,{x:530,y:260,size:14,font:normal});
-  const qr=await qrDataUrl(`ID: ${studentId}\nName: ${name}\nInstitute: ${school}\nCategory: ${role}\nYear: ${year}\nScore: ${score}/${total}\nPercentile: ${Number(percentile).toFixed(2)}%\nAssessment Time: ${formatSeconds(timeTaken)}\nTotal Duration: ${duration} minutes\nVerify at: https://cert.iarco.org`);
-  const qrBytes=await fetch(qr).then(r=>r.arrayBuffer());const qrImg=await pdf.embedPng(qrBytes);page.drawImage(qrImg,{x:700,y:400,width:90,height:90});
-  const CERT_METADATA={
-    titlePrefix:"IARCO Assessment Certificate",
-    author:"IARCO",
-    subject:"IARCO Assessment Certificate",
-    creator:"IARCO Secure Assessment Portal",
-    producer:"Sanaul Haque IARCO Host",
-    producedDate:"2026-08-20T00:00:00+06:00"
-  };
-  const producedAt=new Date(CERT_METADATA.producedDate);
-  const metadata={
-    title:`${CERT_METADATA.titlePrefix} - ${name}`,
-    author:CERT_METADATA.author,
-    subject:CERT_METADATA.subject,
-    keywords:[studentId,String(user?.program||""),String(user?.batch||""),String(user?.role||user?.category||""),year].filter(Boolean),
-    creator:CERT_METADATA.creator,
-    producer:CERT_METADATA.producer,
-    creationDate:producedAt,
-    modificationDate:producedAt
-  };
-  pdf.setTitle(metadata.title);pdf.setAuthor(metadata.author);pdf.setSubject(metadata.subject);pdf.setKeywords(metadata.keywords);pdf.setCreator(metadata.creator);pdf.setProducer(metadata.producer);pdf.setCreationDate(metadata.creationDate);pdf.setModificationDate(metadata.modificationDate);
-  return {base64:bytesToBase64(await pdf.save())};
-}
-
 async function submit(reason){
   if(submitting)return;submitting=true;clearInterval(timer);const timeTaken=Math.max(0,Math.round((Date.now()-startedAt)/1000));
   try{
