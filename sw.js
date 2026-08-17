@@ -1,6 +1,6 @@
-const CACHE_NAME = 'iarco-secure-quiz-v14-offline-queue';
+const CACHE_NAME = 'iarco-secure-quiz-v15-offline-queue';
 const API = 'https://i.eptonline.org/quij/quiz.php';
-const QUEUE_DB='iarco_assessment_queue_v14';
+const QUEUE_DB='iarco_assessment_queue_v15';
 const QUEUE_STORE='submissions';
 const CORE = [
   './', './index.html', './styles.css', './app.js', './quiz.json', './users.json', './sw.js',

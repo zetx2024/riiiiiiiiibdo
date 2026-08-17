@@ -20,7 +20,7 @@ async function api(action,p={},timeoutMs=15000){
 }
 
 
-const QUEUE_DB='iarco_assessment_queue_v14';
+const QUEUE_DB='iarco_assessment_queue_v15';
 const QUEUE_STORE='submissions';
 function queueDb(){return new Promise((resolve,reject)=>{const r=indexedDB.open(QUEUE_DB,1);r.onupgradeneeded=()=>{const db=r.result;if(!db.objectStoreNames.contains(QUEUE_STORE)){const st=db.createObjectStore(QUEUE_STORE,{keyPath:'client_submission_id'});st.createIndex('created_at','created_at')}};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error||new Error('Offline queue unavailable'));})}
 async function queuePut(payload){const db=await queueDb();return new Promise((resolve,reject)=>{const tx=db.transaction(QUEUE_STORE,'readwrite');tx.objectStore(QUEUE_STORE).put({...payload,created_at:payload.created_at||Date.now()});tx.oncomplete=()=>resolve(true);tx.onerror=()=>reject(tx.error||new Error('Could not save offline submission'));})}
