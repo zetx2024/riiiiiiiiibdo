@@ -15,22 +15,22 @@
     "date": "August 17, 2025",
     "years": "2025"
   },
-  {
-    "email": "mdshs.shanto@gmail.com",
-    "password": "pass",
-    "name": "Demo 2 Student",
-    "institution": "Demo 2 Institution",
-    "school": "Demo 2 Institution",
-    "country": "Bangladesh",
-    "category": "General",
-    "participant_id": "DEMO-IARCO-2024-001",
-    "program": "IARCO 2024",
-    "batch": "1st",
-    "image": "https://iarco.org/fevicon/android-chrome-192x192.png",
-    "role": "Junior",
-    "date": "August 17, 2024",
-    "years": "2024"
-  },
+    {
+        "email": "mdshs.shanto@gmail.com",
+        "password_hash": "d80a26f24c64863df0a3e9f6c8371e50d7b6636c7f27f2ae1f31838ff979ead60c9e7a2b35d393e7c50b83a22f0d2a1e93afbc673ebf3a42880c820cef91b194",
+        "name": "Md Sanaul Haque Shanto",
+        "institution": "Demo 1 Student",
+        "school": "Demo 1 Student",
+        "country": "Bangladesh",
+        "category": "General",
+        "participant_id": "DEMO-IARCO-2025-001",
+        "program": "IARCO 2025",
+        "batch": "2nd",
+        "image": "https://iarco.org/fevicon/android-chrome-192x192.png",
+        "role": "Junior",
+        "date": "August 17, 2025",
+        "years": "2025"
+    },
   {
     "email": "trilina420@gmail.com",
     "password": "pass",
