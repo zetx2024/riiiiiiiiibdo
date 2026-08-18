@@ -131,7 +131,7 @@ async function home(){
   let s=read();
   try{
     const r=await api("status",{email:safeEmail()});
-    if(r.exists){s={status:r.status,score:r.score,total_questions:r.total_questions,percentile:r.percentile,submitted_at:r.submitted_at,time_taken:r.time_taken,duration_minutes:r.duration_minutes,certificate_file:r.certificate_file,email_status:r.email_status};save(s)}
+    if(r.exists){s={status:r.status,attempt_id:r.attempt_id,score:r.score,total_questions:r.total_questions,percentile:r.percentile,submitted_at:r.submitted_at,time_taken:r.time_taken,duration_minutes:r.duration_minutes,certificate_file:r.certificate_file,email_status:r.email_status};save(s)}
     else{s=null;localStorage.removeItem(key())}
   }catch(e){/* keep cached state if API temporarily unavailable */}
 

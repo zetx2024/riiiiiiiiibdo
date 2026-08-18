@@ -1,4 +1,4 @@
-const CACHE_NAME = 'iarco-secure-quiz-v18-offline-queue';
+const CACHE_NAME = 'iarco-secure-quiz-v19-offline-queue';
 const API = 'https://i.eptonline.org/quij/quiz.php';
 const QUEUE_DB='iarco_assessment_queue_v18';
 const QUEUE_STORE='submissions';
