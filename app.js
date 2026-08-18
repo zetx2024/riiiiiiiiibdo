@@ -50,7 +50,7 @@ async function processCertificateAfterQueuedSubmit(r){
   const progress=showSubmissionProgress();await allowProgressPaint();
   progress.set(2,'Preparing your certificate','Your result is saved. We are now generating your certificate PDF.');
   const cert=await generateCertificatePdf(r.score,r.total_questions,r.percentile,r.time_taken,r.duration_minutes);
-  progress.set(3,'Sending your certificate','Your certificate is ready. We are securely sending it to your registered email address.');await allowProgressPaint();
+  progress.set(3,'Preparing your certificate','Your certificate is being prepared. It will be sent automatically to your registered email address.');await allowProgressPaint();
   const sent=await api('certificate_upload',{attempt_id:r.attempt_id,email:safeEmail(),certificate_pdf_base64:cert.base64});
   progress.set(4,'Submission complete','Your assessment has been fully processed.');progress.finish();await new Promise(r=>setTimeout(r,450));
   save({status:r.status||'COMPLETED',attempt_id:r.attempt_id,score:r.score,total_questions:r.total_questions,percentile:r.percentile,submitted_at:r.submitted_at,time_taken:r.time_taken,duration_minutes:r.duration_minutes,email_status:sent.email_status||'FAILED',certificate_file:sent.certificate_file||'',certificate_error:sent.email_error||''});
@@ -125,7 +125,21 @@ function login(){
   document.querySelectorAll("#email,#password").forEach(i=>i.addEventListener("keydown",e=>{if(e.key==="Enter")go()}));
 }
 
-async function downloadCertificate(attemptId){const b=document.getElementById("downloadCertificateBtn");if(!b)return;const old=b.textContent;b.disabled=true;b.textContent="Preparing download…";try{const r=await fetch(`${API}?action=certificate_download`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:safeEmail(),attempt_id:Number(attemptId)})});if(!r.ok)throw Error("Certificate download is not available yet.");const blob=await r.blob();const url=URL.createObjectURL(blob);const a=document.createElement("a");a.style.display="none";a.href=url;a.download="IARCO_Certificate.pdf";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}catch(e){alert(e.message||"Could not download the certificate.");}finally{b.disabled=false;b.textContent=old;}}
+async function downloadCertificate(attemptId,expectedFilename='IARCO_Certificate.pdf'){
+  const b=document.getElementById("downloadCertificateBtn");if(!b)return;
+  const old=b.textContent;b.disabled=true;b.textContent="Preparing download…";
+  try{
+    const r=await fetch(`${API}?action=certificate_download`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:safeEmail(),attempt_id:Number(attemptId)})});
+    if(!r.ok)throw Error("Certificate download is not available yet.");
+    const blob=await r.blob();
+    const cd=r.headers.get('Content-Disposition')||'';
+    const m=cd.match(/filename="?([^";]+)"?/i);
+    const filename=(m&&m[1]?m[1]:expectedFilename).trim()||'IARCO_Certificate.pdf';
+    const url=URL.createObjectURL(blob);const a=document.createElement("a");a.style.display="none";a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+  }catch(e){alert(e.message||"Could not download the certificate.");}
+  finally{b.disabled=false;b.textContent=old;}
+}
 
 async function home(){
   let s=read();
@@ -151,7 +165,7 @@ async function home(){
       <p class="muted center-note">Another attempt is available only after an administrator deletes this submission.</p>`;
   if(s?.status==="COMPLETED" && s?.certificate_file){
     const btn=document.querySelector('#downloadCertificateBtn');
-    if(btn) btn.onclick=()=>downloadCertificate(s.attempt_id);
+    if(btn) btn.onclick=()=>downloadCertificate(s.attempt_id,s.certificate_file||'IARCO_Certificate.pdf');
   }
     }else if(s?.status==="CHEATED"){
     c.innerHTML=`<div class="status-panel danger-panel"><strong>Attempt closed</strong><p>${esc(name)}, a quiz security violation was recorded. Please contact the administrator.</p></div>`;
@@ -364,7 +378,7 @@ function showSubmissionProgress(){
     <h2 id="submitProgressTitle">Saving your assessment</h2>
     <p id="submitProgressMessage" class="muted">Please keep this page open while we securely save your answers.</p>
     <div class="submission-progress-track"><div id="submitProgressBar" class="submission-progress-fill" style="width:12%"></div></div>
-    <div class="submission-progress-steps"><span id="submitStep1" class="active">1. Save answers</span><span id="submitStep2">2. Prepare certificate</span><span id="submitStep3">3. Send certificate</span></div>
+    <div class="submission-progress-steps"><span id="submitStep1" class="active">1. Save answers</span><span id="submitStep2">2. Prepare certificate</span><span id="submitStep3">3. Prepare certificate</span></div>
     <p class="submission-progress-note">Do not close or refresh this page until processing is complete.</p>
   </div>`;
   document.body.appendChild(el);
@@ -408,7 +422,11 @@ async function submit(reason){
     }
     progress.set(4,'Submission complete','Your assessment has been fully processed.');progress.finish();await new Promise(r=>setTimeout(r,450));
     const s={status:r.status||'COMPLETED',attempt_id:attemptId,score:r.score,total_questions:r.total_questions,percentile:r.percentile,submitted_at:r.submitted_at,time_taken:r.time_taken,duration_minutes:r.duration_minutes,email_status:emailStatus,certificate_file:certificateFile,certificate_error:certificateError};save(s);
-    setPage(`<main class="portal-shell"><section class="student-card completion-card"><div class="result-hero"><div class="result-icon">✓</div><div><div class="eyebrow">SUBMISSION RECEIVED</div><h1>Assessment saved successfully</h1><p>Your answers and result are recorded in the assessment system.</p></div></div><div class="stats-grid"><div class="stat"><span>Score</span><b>${esc(r.score)}/${esc(r.total_questions)}</b></div><div class="stat"><span>Time taken</span><b>${formatSeconds(r.time_taken)}</b></div><div class="stat"><span>Duration</span><b>${esc(r.duration_minutes)} min</b></div></div><div class="certificate-status ${emailStatus==='SENT'?'good':'warn'}"><strong>Certificate: ${esc(emailStatus)}</strong>${certificateFile?`<br><button type="button" id="downloadCertificateBtn" class="btn gold" style="margin-top:12px">Download Certificate</button>`:''}${certificateError?`<br><span>${esc(certificateError)}</span>`:''}${emailStatus!=='SENT'?`<br><span>The assessment itself is saved. The administrator can inspect the error and resend when the certificate file is available.</span>`:''}</div></section></main>`);
+    const certificateMessage=certificateError
+      ? `<span class="certificate-error">${esc(certificateError)}</span>`
+      : `<span>Your certificate has been prepared and will be sent automatically to your registered email address.</span>`;
+    setPage(`<main class="portal-shell"><section class="student-card completion-card"><div class="result-hero"><div class="result-icon">✓</div><div><div class="eyebrow">SUBMISSION RECEIVED</div><h1>Assessment saved successfully</h1><p>Your answers and result are recorded in the assessment system.</p></div></div><div class="stats-grid"><div class="stat"><span>Score</span><b>${esc(r.score)}/${esc(r.total_questions)}</b></div><div class="stat"><span>Time taken</span><b>${formatSeconds(r.time_taken)}</b></div><div class="stat"><span>Duration</span><b>${esc(r.duration_minutes)} min</b></div></div><div class="certificate-status ${certificateError?'warn':'good'}"><strong>Certificate prepared</strong><br>${certificateMessage}</div><button type="button" id="goDashboardBtn" class="btn gold full" style="margin-top:16px">Go Dashboard</button></section></main>`);
+    document.querySelector('#goDashboardBtn')?.addEventListener('click',()=>home());
   }catch(e){document.querySelector('#submissionProgress')?.remove();submitting=false;alert(e.message||'Submission failed');startTimer();}
 }
 
