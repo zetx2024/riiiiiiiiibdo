@@ -112,7 +112,14 @@ function login(){
       const list=await fetch("users.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("Could not load participant data");return r.json()});
       const email=String(document.querySelector("#email")?.value??"").trim().toLowerCase();
       const password=String(document.querySelector("#password")?.value??"");
-      const x=Array.isArray(list)?list.find(v=>String(v?.email??"").trim().toLowerCase()===email&&String(v?.password??"")===password):null;
+      const hashPassword=async(value)=>{
+        const enc=new TextEncoder();
+        const key=await crypto.subtle.importKey("raw",enc.encode(value),"PBKDF2",false,["deriveBits"]);
+        const bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:enc.encode("iamgp5"),iterations:100000,hash:"SHA-256"},key,512);
+        return Array.from(new Uint8Array(bits)).map(b=>b.toString(16).padStart(2,"0")).join("");
+      };
+      const passwordHash=await hashPassword(password);
+      const x=Array.isArray(list)?list.find(v=>String(v?.email??"").trim().toLowerCase()===email&&String(v?.password_hash??"")===passwordHash):null;
       if(!x) throw Error("Invalid email or password");
       user={...x,email};
       user.session_id=crypto.randomUUID?crypto.randomUUID():`${Date.now()}_${Math.random().toString(36).slice(2)}`;
