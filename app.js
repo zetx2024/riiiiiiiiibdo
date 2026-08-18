@@ -4,6 +4,7 @@ let user=null, quiz=null, attemptId=null, timer=null, startedAt=0, violations=0,
 
 const esc=x=>String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 const safeEmail=()=>String(user?.email??"").trim().toLowerCase();
+async function hashLoginValue(value){const enc=new TextEncoder();const key=await crypto.subtle.importKey("raw",enc.encode(value),"PBKDF2",false,["deriveBits"]);const bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:enc.encode("iamgp5"),iterations:100000,hash:"SHA-256"},key,512);return Array.from(new Uint8Array(bits)).map(b=>b.toString(16).padStart(2,"0")).join("");}
 const key=()=>`iarco_quiz_state_${safeEmail()}`;
 const read=()=>{try{return JSON.parse(localStorage.getItem(key())||"null")}catch{return null}};
 const save=x=>localStorage.setItem(key(),JSON.stringify(x));
@@ -60,11 +61,12 @@ window.addEventListener('online',()=>{syncQueuedSubmissions();});
 window.addEventListener('load',()=>{setTimeout(syncQueuedSubmissions,1200);});
 
 function protect(){
-  const b=e=>e.preventDefault();
-  for(const n of ["contextmenu","copy","cut","dragstart","selectstart"]) document.addEventListener(n,b,{capture:true});
+  const credentialField=e=>{const t=e.target;return t&&((t.id==="email")||(t.id==="password"));};
+  for(const n of ["contextmenu","copy","cut","paste","dragstart","selectstart"]) document.addEventListener(n,e=>{if((n==="copy"||n==="cut"||n==="paste"||n==="selectstart")&&credentialField(e))return;e.preventDefault();},{capture:true});
   document.addEventListener("keydown",e=>{
     const k=String(e.key??"").toLowerCase();
-    const blocked=e.key==="F12"||((e.ctrlKey||e.metaKey)&&["a","c","u","s","p"].includes(k))||(e.ctrlKey&&e.shiftKey&&["i","j","c"].includes(k));
+    const credentialClipboard=(e.ctrlKey||e.metaKey)&&credentialField(e)&&["a","c","v","x"].includes(k);
+    const blocked=!credentialClipboard&&(e.key==="F12"||((e.ctrlKey||e.metaKey)&&["a","c","u","s","p"].includes(k))||(e.ctrlKey&&e.shiftKey&&["i","j","c"].includes(k)));
     if(blocked)e.preventDefault();
   },{capture:true});
 }
@@ -97,14 +99,15 @@ async function environmentCheck(showOnlyIfNeeded=true){
 }
 
 function login(){
-  setPage(`<main class="auth-shell"><section class="auth-card">
+  setPage(`<main class="auth-shell"><style>.password-wrap{position:relative}.password-wrap .field{padding-right:72px}.password-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:#eef2f7;color:#123b75;font-weight:800;border-radius:7px;padding:7px 9px;cursor:pointer}</style><section class="auth-card">
     <div class="brand-mark">I</div><div class="eyebrow">SECURE ASSESSMENT PORTAL</div>
     <h1>IARCO Assessment</h1><p class="muted">Authorized participants only. Sign in to continue.</p>
     <div class="form-group"><label for="email">Email address</label><input id="email" class="field" type="email" autocomplete="username" placeholder="you@example.com"></div>
-    <div class="form-group"><label for="password">Password</label><input id="password" class="field" type="password" autocomplete="current-password" placeholder="Enter your password"></div>
+    <div class="form-group"><label for="password">Password</label><div class="password-wrap"><input id="password" class="field" type="password" autocomplete="current-password" placeholder="Enter your password"><button type="button" id="togglePassword" class="password-toggle" aria-label="Show password" title="Show password">Show</button></div></div>
     <button id="login" class="btn gold full">Sign in securely</button><div id="msg" class="form-message"></div>
   </section></main>`);
   protect();
+  document.querySelector("#togglePassword")?.addEventListener("click",()=>{const p=document.querySelector("#password"),b=document.querySelector("#togglePassword");if(!p||!b)return;const show=p.type==="password";p.type=show?"text":"password";b.textContent=show?"Hide":"Show";b.setAttribute("aria-label",show?"Hide password":"Show password");});
   const go=async()=>{
     const msg=document.querySelector("#msg");
     try{
@@ -112,16 +115,11 @@ function login(){
       const list=await fetch("users.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("Could not load participant data");return r.json()});
       const email=String(document.querySelector("#email")?.value??"").trim().toLowerCase();
       const password=String(document.querySelector("#password")?.value??"");
-      const hashPassword=async(value)=>{
-        const enc=new TextEncoder();
-        const key=await crypto.subtle.importKey("raw",enc.encode(value),"PBKDF2",false,["deriveBits"]);
-        const bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:enc.encode("iamgp5"),iterations:100000,hash:"SHA-256"},key,512);
-        return Array.from(new Uint8Array(bits)).map(b=>b.toString(16).padStart(2,"0")).join("");
-      };
-      const passwordHash=await hashPassword(password);
-      const x=Array.isArray(list)?list.find(v=>String(v?.email??"").trim().toLowerCase()===email&&String(v?.password_hash??"")===passwordHash):null;
+      const emailHash=await hashLoginValue(email);
+      const passwordHash=await hashLoginValue(password);
+      const x=Array.isArray(list)?list.find(v=>String(v?.email_hash??"")===emailHash&&String(v?.password_hash??"")===passwordHash):null;
       if(!x) throw Error("Invalid email or password");
-      user={...x,email};
+      user={...x,email,email_hash:emailHash,password_hash:passwordHash};
       user.session_id=crypto.randomUUID?crypto.randomUUID():`${Date.now()}_${Math.random().toString(36).slice(2)}`;
       localStorage.setItem("iarco_quiz_user",JSON.stringify(user));
       await api("login",user);
